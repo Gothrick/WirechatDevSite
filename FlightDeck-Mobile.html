@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flight Deck mobile - WireChat redesign</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.dark{--bg:#14100A;--sf:#1E1810;--rail:#0E0B07;--fg:#F2E6CC;--mu:#BBA882;--ac:#FFB000;--onac:#14100A;--al:#FF6A2B;--onal:#14100A;--bd:#8A7347;--soft:#2A2116;--a1:#FFB000;--a2:#FF6A2B;--a3:#BBA882;--ona:#14100A;--stage:#050403}
+.light{--bg:#F3EBDA;--sf:#FFF9EA;--rail:#E7DCC2;--fg:#2A1E0B;--mu:#66573A;--ac:#8A5300;--onac:#FFFFFF;--al:#BA3A06;--onal:#FFFFFF;--bd:#7A6841;--soft:#E7DCC2;--a1:#8A5300;--a2:#BA3A06;--a3:#66573A;--ona:#FFFFFF;--stage:#CFC4A8}
+.stage{width:1680px;height:844px;display:flex;gap:40px;background:var(--stage);font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:17px;line-height:1.5;color:var(--fg)}
+.ph{width:390px;height:844px;box-sizing:border-box;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;border-radius:28px;border-top:6px solid var(--al)}
+.lab{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:.06em;color:var(--mu)}
+.mono{font-family:'IBM Plex Mono',monospace}
+.top{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:60px;border-bottom:2px solid var(--bd);background:var(--sf)}
+.top h1{margin:0;flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;letter-spacing:.04em}
+.round{width:44px;height:44px;border-radius:50%;border:2px solid var(--bd);background:var(--bg);color:var(--fg);display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:20px;flex:none}
+.sh{padding:14px 16px 4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sh h2{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:.05em;color:var(--mu)}
+.new{min-height:44px;border-radius:999px;border:2px solid var(--fg);background:var(--ac);color:var(--onac);box-shadow:3px 3px 0 var(--fg);padding:0 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:.04em}
+.srvrow{display:flex;gap:12px;padding:12px 16px 8px;overflow:hidden}
+.srv{position:relative;width:56px;height:56px;box-sizing:border-box;flex:none;border-radius:50%;background:var(--sf);color:var(--fg);border:2px solid var(--bd);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:21px;display:grid;place-items:center}
+.srv.on{border-radius:18px;background:var(--ac);color:var(--onac);border-color:var(--fg);box-shadow:3px 3px 0 var(--fg)}
+.pill{position:absolute;right:-6px;bottom:-6px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;background:var(--fg);color:var(--bg);border:3px solid var(--bg);border-radius:999px;min-width:24px;height:22px;line-height:16px;text-align:center;box-sizing:content-box;padding:0 3px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px;margin:2px 8px;padding:0 10px;border-radius:14px}
+.row.on{background:var(--soft);box-shadow:inset 0 0 0 2px var(--ac);font-weight:700}
+.cnt{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;background:var(--fg);color:var(--bg);border-radius:999px;min-width:22px;height:20px;line-height:20px;text-align:center;padding:0 6px;box-sizing:border-box}
+.ava{position:relative;width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:var(--ona)}
+.a1{background:var(--a1)}.a2{background:var(--a2)}.a3{background:var(--a3)}
+.dot{position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;box-sizing:border-box;border:3px solid var(--bg);background:var(--ac)}
+.dot.away{background:var(--bg);box-shadow:inset 0 0 0 2px var(--mu)}
+.row2{display:flex;align-items:center;gap:12px;min-width:0}
+.tabs{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);padding:8px 8px 14px;background:var(--rail);border-top:2px solid var(--bd)}
+.tabs div{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:.05em;color:var(--mu)}
+.tabs i{width:56px;height:34px;border-radius:999px;display:grid;place-items:center}
+.tabs i b{width:18px;height:18px;border:3px solid currentColor;border-radius:50%;box-sizing:border-box}
+.tabs .on{color:var(--fg)}
+.tabs .on i{background:var(--ac);color:var(--onac)}
+.msgs{flex:1;padding:6px 10px;overflow:hidden}
+.msg{display:flex;gap:12px;padding:9px 6px;border-radius:12px}
+.msg.hov{background:var(--soft)}
+.mh{display:flex;gap:8px;align-items:baseline}
+.mh time{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mu)}
+.mh em{font-size:12px;color:var(--mu)}
+.fail{margin:0 10px;border:2px solid var(--al);border-radius:14px;background:var(--soft);padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:14px}
+.fail button{min-height:44px;border-radius:999px;border:2px solid var(--fg);background:var(--bg);color:var(--fg);padding:0 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px}
+.comp{display:flex;align-items:center;gap:8px;margin:8px 10px 14px;background:var(--sf);border:2px solid var(--bd);border-radius:24px;padding:5px 5px 5px 18px}
+.field{flex:1;min-width:0;color:var(--mu)}
+.send{height:44px;border-radius:999px;border:2px solid var(--fg);background:var(--ac);color:var(--onac);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.05em;padding:0 16px;box-shadow:2px 2px 0 var(--fg)}
+.in{display:flex;flex-direction:column;gap:6px}
+.in .box{border:2px solid var(--bd);background:var(--sf);border-radius:14px;min-height:54px;padding:0 16px;display:flex;align-items:center;font-size:18px}
+.err{border:2px solid var(--al);background:var(--soft);border-radius:14px;padding:10px 14px;display:flex;gap:10px;font-size:15px}
+.err b{font-family:'IBM Plex Mono',monospace;color:var(--al)}
+.cta{width:100%;min-height:58px;border-radius:16px;border:2px solid var(--fg);background:var(--ac);color:var(--onac);box-shadow:4px 4px 0 var(--fg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;letter-spacing:.05em}
+.card{margin:10px 12px 0;background:var(--sf);border:2px solid var(--bd);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:23px;letter-spacing:.04em}
+.btn{min-height:48px;border-radius:14px;border:2px solid var(--fg);background:var(--bg);color:var(--fg);padding:0 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.04em;box-shadow:3px 3px 0 var(--fg)}
+.btn.d{border-color:var(--al);color:var(--al);box-shadow:3px 3px 0 var(--al)}
+</style>
+
+<style>html,body{margin:0}</style>
+</head><body>
+
+<div class="stage dark">
+
+  <div class="ph">
+    <div style="padding:74px 26px 26px;display:flex;flex-direction:column;gap:20px;flex:1">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:64px;height:64px;border-radius:20px;background:#14100A;border:2px solid #F2E6CC;box-shadow:4px 4px 0 var(--fg);display:grid;place-items:center"><img src="logo.png" alt="" style="width:48px;height:48px;object-fit:contain"></div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;letter-spacing:.04em">WireChat</span>
+      </div>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:54px;line-height:.95">Connexion</div>
+        <p style="margin:6px 0 0;color:var(--mu);font-size:16px">Content de te revoir.</p>
+      </div>
+      <div class="err" role="alert"><b>ERR</b><span>Le mot de passe est requis.</span></div>
+      <div class="in"><label class="lab" style="font-size:18px">COURRIEL</label><div class="box">ana@exemple.ca</div></div>
+      <div class="in"><label class="lab" style="font-size:18px">MOT DE PASSE</label><div class="box" style="border-color:var(--al)">&nbsp;</div></div>
+      <button class="cta">Se connecter</button>
+      <div style="text-align:center">Pas de compte ? <a href="#" style="color:var(--ac);font-weight:700">S'inscrire</a></div>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="top"><h1>Conversations</h1></div>
+    <div class="sh"><h2>SALONS</h2></div>
+    <div class="srvrow">
+      <div class="srv on" aria-label="Équipe projet, sélectionné">ÉP</div>
+      <div class="srv" aria-label="Études, 3 non lus">ÉT<span class="pill">3</span></div>
+      <div class="srv" aria-label="Musique">MU</div>
+      <div class="srv" aria-label="Jeux vidéo, 12 non lus">JV<span class="pill">12</span></div>
+      <div class="srv" aria-label="Cinéma">CI</div>
+    </div>
+    <div class="sh"><h2>CONVERSATIONS PRIVÉES</h2></div>
+    <div style="padding:4px 16px 8px"><button class="new">Nouvelle conversation</button></div>
+    <div class="row"><span class="row2"><span class="ava a1">AN<i class="dot"></i></span>Ana</span></div>
+    <div class="row on"><span class="row2"><span class="ava a3">MA<i class="dot away"></i></span>Marc, Léa</span><span class="cnt">2</span></div>
+    <div class="row"><span class="row2"><span class="ava a2">LÉ<i class="dot"></i></span>Léa</span></div>
+    <div class="row"><span class="row2"><span class="ava a3">SO</span>Sofia</span></div>
+    <div class="tabs">
+      <div class="on"><i><b></b></i>Conversations</div>
+      <div><i><b style="border-radius:3px"></b></i>Recherche</div>
+      <div><i><b style="border-style:dotted"></b></i>Préférences</div>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="top"><span class="round" aria-label="Retour">&lt;</span><h1>Conversation</h1></div>
+    <div class="msgs">
+      <div class="msg"><span class="ava a1">AN</span><div><div class="mh"><b>Ana</b><time>14:02</time></div>On valide la maquette demain ? J'ai préparé les captures.</div></div>
+      <div class="msg hov"><span class="ava a3">MA</span><div><div class="mh"><b>Marc</b><time>14:05</time></div>Oui, je prépare le résumé des retours.</div></div>
+      <div class="msg"><span class="ava a1" style="box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--fg)">ZA</span><div><div class="mh"><b>Zack</b><time>14:08</time><em>modifié</em></div>Parfait. Les palettes seront dans le dossier avant 16 h.</div></div>
+      <div class="msg"><span class="ava a2">LÉ</span><div><div class="mh"><b>Léa</b><time>14:11</time></div>Je vérifie le contraste du thème clair ce soir.</div></div>
+    </div>
+    <div class="fail" role="alert"><span style="flex:1">Le message n'a pas pu être envoyé. Réessaie.</span><button>Réessayer</button></div>
+    <div class="comp"><div class="field">Écrire un message</div><button class="send">Envoyer</button></div>
+  </div>
+
+  <div class="ph">
+    <div class="top"><h1>Préférences</h1></div>
+    <div class="card"><h3>Compte</h3><div>Connecté en tant que <b>Zack</b></div></div>
+    <div class="card"><h3>Notifications</h3><div style="display:flex;gap:8px;align-items:center"><span class="cnt" style="background:var(--ac);color:var(--onac);height:26px;line-height:26px;padding:0 12px">Pas encore demandées</span></div><div style="color:var(--mu);font-size:15px">Autorise les notifications pour être averti des nouveaux messages.</div><button class="btn" style="margin-top:6px">Autoriser les notifications</button></div>
+    <div class="card"><h3>Session</h3><div style="color:var(--mu);font-size:15px">Te déconnecter de WireChat ?</div><div style="display:flex;gap:10px;margin-top:6px"><button class="btn d" style="flex:1">Se déconnecter</button><button class="btn" style="flex:1">Annuler</button></div></div>
+    <div class="tabs">
+      <div><i><b></b></i>Conversations</div>
+      <div><i><b style="border-radius:3px"></b></i>Recherche</div>
+      <div class="on"><i><b style="border-style:dotted"></b></i>Préférences</div>
+    </div>
+  </div>
+
+</div>
+
+
+<button id="wc-toggle" type="button" style="position:fixed;right:16px;bottom:16px;z-index:9999;min-height:44px;padding:0 18px;border-radius:999px;border:2px solid #888;background:#fff;color:#111;font:600 15px system-ui,sans-serif;cursor:pointer">Switch theme</button>
+<script>
+(function(){
+  var b=document.getElementById('wc-toggle');
+  if(location.search.indexOf('thumb')>-1){b.style.display='none';}
+  b.addEventListener('click',function(){
+    var els=document.querySelectorAll('.dark,.light');
+    els.forEach(function(e){
+      if(e.classList.contains('dark')){e.classList.remove('dark');e.classList.add('light');}
+      else{e.classList.remove('light');e.classList.add('dark');}
+    });
+  });
+})();
+</script>
+</body></html>

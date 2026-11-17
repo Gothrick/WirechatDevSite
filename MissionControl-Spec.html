@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mission Control spec - WireChat redesign</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.mc{width:880px;height:1000px;box-sizing:border-box;background:#EFE9DC;color:#1B1B1B;font-family:'Space Grotesk',system-ui,sans-serif;padding:0 48px 40px;display:flex;flex-direction:column;gap:26px}
+.band{margin:0 -48px;background:#DC2A17;color:#fff;display:flex;justify-content:space-between;padding:10px 48px;font-family:'DM Mono',monospace;font-size:14px}
+.lab{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:.08em;text-transform:uppercase}
+.mono{font-family:'DM Mono',monospace}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.sw{width:124px;border:2px solid #1B1B1B;background:#F8F4EA;border-radius:16px;overflow:hidden}
+.sw .c{height:60px;border-bottom:2px solid #1B1B1B}
+.sw .t{padding:6px 8px;font-size:12px;line-height:1.35}
+.sw .t b{display:block;font-size:13px}
+.sec{display:flex;gap:14px;align-items:baseline;border-bottom:2px solid #1B1B1B;padding-bottom:4px;margin-bottom:12px}
+.sec .n{font-family:'DM Mono',monospace;font-size:14px;color:#DC2A17;font-weight:500}
+.btn{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:.08em;text-transform:uppercase;border:2px solid #1B1B1B;background:#F8F4EA;color:#1B1B1B;border-radius:999px;padding:0 24px;min-height:48px}
+.btn.red{background:#DC2A17;color:#fff}
+.stamp{font-family:'DM Mono',monospace;font-weight:500;font-size:14px;background:#DC2A17;color:#fff;min-width:28px;height:28px;display:inline-grid;place-items:center;padding:0 8px;box-sizing:border-box;border-radius:999px}
+.band{position:relative;margin-bottom:10px}.band:after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;background:repeating-linear-gradient(135deg,#1B1B1B 0 9px,#DC2A17 9px 18px)}</style>
+
+<style>html,body{margin:0}</style>
+</head><body>
+
+<div class="mc">
+  <div class="band"><span style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="" style="width:30px;height:30px;border-radius:50%;background:#14100A;padding:3px;box-sizing:border-box;object-fit:contain">WIRECHAT · INTERFACE STANDARDS</span><span>DIRECTION 2 · REV A</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px">
+    <h1 style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:92px;line-height:.9;letter-spacing:-.005em;text-transform:uppercase">Mission<br>Control</h1>
+    <p style="margin:0;width:290px;font-size:16px;line-height:1.5;color:#55524A">An Apollo-era checklist for chat. Light first, ink borders, and red reserved for anything that needs you.</p>
+  </div>
+
+  <div>
+    <div class="sec"><span class="n">1.0</span><span class="lab">Colour · day</span></div>
+    <div class="row">
+      <div class="sw"><div class="c" style="background:#EFE9DC"></div><div class="t"><b>Paper</b><span class="mono">#EFE9DC</span></div></div>
+      <div class="sw"><div class="c" style="background:#F8F4EA"></div><div class="t"><b>Panel</b><span class="mono">#F8F4EA</span></div></div>
+      <div class="sw"><div class="c" style="background:#1B1B1B"></div><div class="t"><b>Ink</b><span class="mono">#1B1B1B · 14.2:1</span></div></div>
+      <div class="sw"><div class="c" style="background:#55524A"></div><div class="t"><b>Muted</b><span class="mono">#55524A · 7.1:1</span></div></div>
+      <div class="sw"><div class="c" style="background:#DC2A17"></div><div class="t"><b>Alarm red</b><span class="mono">#DC2A17 · 4.8:1 white text</span></div></div>
+      <div class="sw"><div class="c" style="background:#0B3D91"></div><div class="t"><b>Link blue</b><span class="mono">#0B3D91 · 9.2:1</span></div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec"><span class="n">1.1</span><span class="lab">Colour · night</span></div>
+    <div class="row">
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#101418"></div><div class="t" style="color:#F1EDE0"><b>Night</b><span class="mono">#101418</span></div></div>
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#1A2027"></div><div class="t" style="color:#F1EDE0"><b>Panel</b><span class="mono">#1A2027</span></div></div>
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#F1EDE0"></div><div class="t" style="color:#F1EDE0"><b>Chalk</b><span class="mono">#F1EDE0 · 15.8:1</span></div></div>
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#AEB4B9"></div><div class="t" style="color:#F1EDE0"><b>Muted</b><span class="mono">#AEB4B9 · 7.8:1</span></div></div>
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#FF4B3A"></div><div class="t" style="color:#F1EDE0"><b>Alarm</b><span class="mono">#FF4B3A · 5.6:1</span></div></div>
+      <div class="sw" style="background:#1A2027"><div class="c" style="background:#7FA8FF"></div><div class="t" style="color:#F1EDE0"><b>Link</b><span class="mono">#7FA8FF · 7.0:1</span></div></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap">
+    <div style="flex:1;min-width:360px">
+      <div class="sec"><span class="n">2.0</span><span class="lab">Type</span></div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:38px;letter-spacing:.05em;text-transform:uppercase;line-height:1">Canal 07 · Général</div>
+      <div class="mono" style="font-size:13px;color:#55524A;margin:4px 0 12px">Space Grotesk 700 · labels, 1 to 3 words, 14px and up</div>
+      <div style="font-size:18px;line-height:1.55;max-width:400px">Réunion de validation demain à 10 h. Merci de relire les trois palettes avant.</div>
+      <div class="mono" style="font-size:13px;color:#55524A;margin:4px 0 12px">Space Grotesk · all message text, sentence case</div>
+      <div class="mono" style="font-size:18px">T+ 04:12 · 14:02 · CH-07</div>
+      <div class="mono" style="font-size:13px;color:#55524A;margin-top:4px">DM Mono · clock and counters</div>
+    </div>
+    <div style="flex:1;min-width:340px;display:flex;flex-direction:column;gap:14px">
+      <div class="sec"><span class="n">3.0</span><span class="lab">Parts</span></div>
+      <div class="row" style="align-items:center;gap:14px"><button class="btn red">Transmettre</button><button class="btn">Annuler</button><span class="stamp">3</span><span class="stamp">128</span></div>
+      <div style="border-left:6px solid #DC2A17;padding-left:12px"><div class="mono" style="font-size:13px;color:#55524A">14:02 · ANA</div><div style="font-size:17px">Maquette validée pour le 12.</div></div>
+      <div style="border:2px solid #1B1B1B;border-radius:14px;background:#F8F4EA;padding:10px 14px;font-size:16px;color:#55524A">Aucun trafic sur ce canal. Tout est nominal.</div>
+      <div style="display:flex;gap:10px;align-items:center;font-size:15px"><span style="width:18px;height:18px;border:2px solid #1B1B1B;background:#1B1B1B;color:#EFE9DC;display:grid;place-items:center;font-size:12px" class="mono">X</span>Lu · <span style="width:18px;height:18px;border:2px solid #1B1B1B;display:inline-block"></span>Non lu</div>
+    </div>
+  </div>
+
+  <div style="margin-top:auto;border-top:2px solid #1B1B1B;padding-top:12px;display:flex;gap:28px;font-size:14px;line-height:1.5;color:#55524A">
+    <div style="flex:1">Red is the only alarm colour. Blue is for links.</div>
+    <div style="flex:1">No glow, no overlays, no gradients. Contrast comes from 2px ink borders.</div>
+    <div style="flex:1">Unread is a number inside a stamp, never a dot.</div>
+  </div>
+</div>
+
+
+</body></html>
