@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bento web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=light]{--page:#E6DCCB;--bg:#f0eee8;--tile:#ffffff;--fg:#201b17;--mu:#6f6553;--line:#e0d3bf;--act:#8a6a2a;--al:#a22a2a;--t1:#e8d7b4;--t2:#f3ebe0;--t3:#eab766;--t4:#f3dcc4;--t5:#f7f1e8;--bub:#f3ebe0;--mine:#eab766;--onmine:#231705;--glow:rgba(234,183,102,.25);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+[data-theme=dark]{--page:#0A0806;--bg:#100e0c;--tile:#1f1a14;--fg:#f0ddb0;--mu:#9c8f74;--line:#3a3226;--act:#eab766;--al:#e08a72;--t1:#5c4520;--t2:#2b241b;--t3:#eab766;--t4:#3a2416;--t5:#241d18;--bub:#2b241b;--mine:#eab766;--onmine:#231705;--glow:rgba(234,183,102,.16);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+body{background:var(--page);color:var(--fg);font-family:'Nunito Sans',system-ui,sans-serif;padding:32px 24px 64px}
+.board{max-width:1280px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px}
+.board h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:52px;line-height:1;margin:0;letter-spacing:-.02em}
+.board header p{margin:6px 0 0;color:var(--mu);max-width:62ch}
+.toggle{font:700 14px 'Nunito Sans',sans-serif;background:var(--tile);color:var(--fg);border:0;border-radius:999px;padding:12px 18px;cursor:pointer;box-shadow:0 1px 0 var(--line)}
+.cap{font:800 13px 'Nunito Sans',sans-serif;color:var(--mu);margin:40px 0 10px;letter-spacing:.06em}
+.cap b{color:var(--fg)}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.app{width:1280px;height:800px;background:var(--bg);color:var(--fg);display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;padding:14px;box-sizing:border-box;overflow:hidden;border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,.14);font-size:15px;line-height:1.45}
+.dock{background:var(--tile);border-radius:24px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0}
+.dk{position:relative;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif;color:var(--fg);background:var(--bg);cursor:pointer}
+.dk.on{background:var(--fg);color:var(--tile)}
+.dk.logo{background:#14100A}
+.dk.logo img{width:34px;height:34px;object-fit:contain}
+.dk .n{position:absolute;top:-4px;right:-6px;font:800 11px 'Nunito Sans',sans-serif;background:var(--al);color:#fff;border-radius:999px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px;box-sizing:border-box;border:2px solid var(--tile)}
+.dk.add{background:transparent;border:2px dashed var(--line);color:var(--mu)}
+.dsep{width:28px;height:2px;border-radius:2px;background:var(--line)}
+.dock .end{margin-top:auto;display:flex;flex-direction:column;gap:10px;align-items:center}
+.av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font:800 14px 'Bricolage Grotesque',sans-serif;color:var(--ona);flex:none;position:relative}
+.av.round{border-radius:50%}
+.av.s{width:30px;height:30px;font-size:12px;border-radius:10px}
+.av.l{width:56px;height:56px;font-size:20px;border-radius:18px}
+.b1{background:var(--a1)}.b2{background:var(--a2)}.b3{background:var(--a3)}.b4{background:var(--a4)}
+.pres{position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;border-radius:50%;border:3px solid var(--tile);background:var(--a3)}
+.pres.away{background:var(--tile);box-shadow:inset 0 0 0 2px var(--mu)}
+.pres.off{background:var(--mu)}
+
+.grid{display:grid;gap:14px;min-height:0}
+.t{background:var(--tile);border-radius:24px;padding:20px;min-width:0;min-height:0;overflow:hidden;position:relative;box-sizing:border-box}
+.t h3{font:800 13px 'Nunito Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+.t h3 .ct{font-size:13px;background:var(--bg);color:var(--fg);border-radius:999px;padding:2px 10px}
+.c1{background:var(--t1)}.c2{background:var(--t2)}.c3{background:var(--t3)}.c4{background:var(--t4)}.c5{background:var(--t5)}
+.c1 h3,.c2 h3,.c3 h3,.c4 h3,.c5 h3{color:var(--fg);opacity:.75}
+.disp{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1;margin:0}
+.btn{font:700 14px 'Nunito Sans',sans-serif;height:40px;padding:0 16px;border-radius:999px;border:0;background:var(--bg);color:var(--fg);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.btn.pri{background:var(--fg);color:var(--tile)}
+.btn.acc{background:var(--ac);color:var(--onac)}
+.btn.danger{background:transparent;color:var(--al);box-shadow:inset 0 0 0 2px var(--al)}
+.btn.sm{height:34px;padding:0 12px;font-size:13px}
+.ib{width:40px;height:40px;border-radius:14px;border:0;background:var(--bg);color:var(--fg);display:grid;place-items:center;cursor:pointer;position:relative}
+.big{font:800 64px 'Bricolage Grotesque',sans-serif;line-height:.9;letter-spacing:-.03em}
+
+/* home */
+.home{grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:230px 1fr 170px}
+.hello{grid-column:1/3;display:flex;flex-direction:column;justify-content:space-between}
+.hello .disp{font-size:56px}
+.hello p{font-size:18px;margin:8px 0 0;max-width:40ch}
+.stats{display:flex;gap:28px}
+.stats div span{display:block;font:700 13px 'Nunito Sans',sans-serif;opacity:.75}
+.online .row{display:flex;gap:10px;flex-wrap:wrap}
+.online .f{display:flex;flex-direction:column;align-items:center;gap:4px;width:64px;font-size:13px;font-weight:700}
+.dm{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.dm:last-child{border:0}
+.dm .w{flex:1;min-width:0}
+.dm .w b{display:block}
+.dm .w span{display:block;color:var(--mu);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm time{font-size:12px;color:var(--mu);font-weight:700}
+.badge{font:800 12px 'Nunito Sans',sans-serif;background:var(--ac);color:var(--onac);border-radius:999px;min-width:22px;height:22px;line-height:22px;text-align:center;padding:0 6px;box-sizing:border-box}
+.srvs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sv{border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:18px;font-weight:800;position:relative}
+.sv .av{border-radius:12px}
+.sv small{display:block;font-weight:600;font-size:12px;opacity:.75}
+.sv .badge{position:absolute;top:12px;right:12px}
+
+/* conversation */
+.conv{grid-template-columns:minmax(0,1fr) 300px}
+.chat{display:flex;flex-direction:column;padding:0}
+.chead{display:flex;align-items:center;gap:12px;padding:16px 18px 12px}
+.chead .disp{font-size:30px}
+.chead .disp span{color:var(--mu);font-weight:500}
+.pills{display:flex;gap:6px;padding:0 18px 14px;border-bottom:1px solid var(--line)}
+.pill{height:34px;padding:0 14px;border-radius:999px;background:var(--bg);display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--mu)}
+.pill.on{background:var(--fg);color:var(--tile)}
+.pill .badge{height:20px;line-height:20px;min-width:20px;font-size:11px}
+.pill.add{background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.msgs{flex:1;min-height:0;overflow:hidden;padding:12px 22px;display:flex;flex-direction:column;gap:10px}
+.day{align-self:center;font-weight:800;font-size:12px;color:var(--mu);background:var(--bg);border-radius:999px;padding:3px 12px}
+.bm{display:flex;gap:10px;align-items:flex-start;max-width:72%}
+.bm>.av{margin-top:24px}
+.bm .body{display:flex;flex-direction:column;gap:4px}
+.bm .who{font-size:13px;font-weight:800;color:var(--mu);margin-left:6px}
+.bm .who time{font-weight:600;margin-left:6px}
+.bub{background:var(--bub);border-radius:20px 20px 20px 6px;padding:10px 16px;font-size:16px;line-height:1.45}
+.bm.me{align-self:flex-end;flex-direction:row-reverse}
+.bm.me .body{align-items:flex-end}
+.bm.me .bub{background:var(--mine);color:var(--onmine);border-radius:20px 20px 6px 20px}
+.bm.me .who{margin:0 6px 0 0}
+.qt{font-size:13px;border-radius:14px;padding:6px 12px;background:var(--bg);color:var(--mu);border-left:4px solid var(--ac)}
+.rxs{display:flex;gap:6px}
+.rx{height:28px;border-radius:999px;background:var(--tile);box-shadow:inset 0 0 0 2px var(--line);padding:0 10px;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700}
+.rx.mine{box-shadow:inset 0 0 0 2px var(--ac)}
+.typing{display:flex;align-items:center;gap:8px;padding:0 22px 8px;color:var(--mu);font-size:13px;font-weight:600}
+.dots{display:flex;gap:3px;background:var(--bub);border-radius:999px;padding:8px 10px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--mu)}
+.comp{margin:0 14px 14px;border-radius:22px;background:var(--bg);padding:6px 6px 6px 8px}
+.comp .rp{display:flex;align-items:center;gap:8px;padding:6px 8px 8px;font-size:13px;color:var(--mu);font-weight:600}
+.comp .rp b{color:var(--fg)}
+.comp .rp .x{margin-left:auto;width:26px;height:26px;border-radius:50%;border:0;background:var(--tile);color:var(--fg);display:grid;place-items:center}
+.comp .in{display:flex;align-items:center;gap:8px;background:var(--tile);border-radius:18px;padding:6px 6px 6px 16px}
+.comp .in span{flex:1;color:var(--mu);font-size:16px}
+.side{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:14px;min-height:0}
+.mem{display:flex;align-items:center;gap:10px;padding:6px 0;font-weight:700}
+.mem small{display:block;font-weight:600;color:var(--mu);font-size:12px}
+
+/* settings */
+.sets{grid-template-columns:1.15fr 1fr 1fr;grid-template-rows:auto 1fr 1fr}
+.shead{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:16px 20px}
+.shead .disp{font-size:40px}
+.shead .search{margin-left:auto;width:300px;height:44px;border-radius:999px;background:var(--bg);display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--mu)}
+.acct{grid-row:2/4;display:flex;flex-direction:column;gap:14px}
+.fld{background:var(--tile);border-radius:16px;padding:10px 14px}
+.fld small{display:block;font-weight:800;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
+.fld div{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:700}
+.seg{display:flex;background:var(--bg);border-radius:999px;padding:4px;gap:4px}
+.seg span{flex:1;text-align:center;font-weight:700;font-size:13px;padding:8px 6px;border-radius:999px;color:var(--mu)}
+.seg span.on{background:var(--tile);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sw{width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:var(--tile)}
+.sw.on{background:var(--ac)}.sw.on:after{left:24px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;font-weight:700}
+.opt small{display:block;font-weight:600;color:var(--mu);font-size:13px}
+.thm{display:flex;gap:10px}
+.thm div{flex:1;height:86px;border-radius:16px;display:flex;align-items:flex-end;padding:8px 10px;font-weight:800;font-size:13px;box-sizing:border-box}
+.thm div span{background:#FFFFFF;color:#1D1B20;border-radius:999px;padding:2px 8px}
+.thm .on{outline:3px solid var(--fg);outline-offset:3px}
+
+/* server */
+.srv{grid-template-columns:1fr 1fr 1fr;grid-template-rows:200px minmax(0,1fr)}
+.ov{display:flex;flex-direction:column;justify-content:space-between}
+.ov .disp{font-size:44px}
+.ov .in{display:flex;gap:8px;align-items:center;background:var(--tile);border-radius:999px;padding:4px 4px 4px 16px;font-weight:700}
+.ov .in span{flex:1}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mc{background:var(--bg);border-radius:18px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-weight:800}
+.mc small{font-weight:600;color:var(--mu);font-size:12px;display:block}
+.chl{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--bg);margin-bottom:8px;font-weight:700}
+.chl .h{color:var(--mu)}
+.chl b{flex:1}
+.chl .ib{width:32px;height:32px;border-radius:10px;background:var(--tile)}
+.cand{display:flex;align-items:center;gap:10px;padding:7px 0;font-weight:700}
+.cand span{flex:1}
+
+/* --- palette WireChat (src/styles/theme.css) + finition --- */
+body{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.board h1{color:var(--fg)}
+.board h1:after{content:"";display:block;width:64px;height:5px;margin-top:12px;background:linear-gradient(90deg,var(--ac),var(--acm));border-radius:3px;box-shadow:0 0 16px var(--glow)}
+.b2,.b4{color:#fff5e8}
+.sw.on{background:linear-gradient(180deg,var(--ac),var(--acm))}
+
+.app,.ph{background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");box-shadow:0 24px 70px rgba(0,0,0,.3),inset 0 0 0 1px var(--line)}
+.t{box-shadow:inset 0 0 0 1px var(--line),0 4px 16px rgba(0,0,0,.16)}
+.app>.dock{background:linear-gradient(180deg,var(--tile),var(--bg));box-shadow:inset 0 0 0 1px var(--line)}
+.dk{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.dk.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd),0 0 18px var(--glow)}
+.dk.logo{box-shadow:0 0 0 1px var(--acd),0 0 18px var(--glow)}
+.dk.add{box-shadow:none}
+.dk .n,.dock .n{background:var(--ald);color:#fff5e8;border-color:var(--tile)}
+.btn{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.pri,.btn.acc,.send{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd);box-shadow:inset 0 -2px 0 var(--acd)}
+.btn.danger{color:var(--al);box-shadow:inset 0 0 0 2px var(--ald);background:transparent}
+.c3{background:radial-gradient(500px 260px at 100% 0%,#f6d69c,transparent 60%),linear-gradient(160deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -3px 0 var(--acd),0 12px 40px var(--glow)}
+.c3 h3,.c3 .disp,.c3 b,.c3 p,.c3 div{color:var(--onac)}
+.c3 h3{opacity:.7}
+.c3 .av{color:var(--onac)}
+.c1{background:linear-gradient(160deg,var(--t1),var(--tile) 85%)}
+.c2{background:linear-gradient(160deg,var(--t2),var(--tile) 85%)}
+.c4{background:linear-gradient(160deg,var(--t4),var(--tile) 85%)}
+.c5{background:linear-gradient(160deg,var(--t5),var(--tile) 85%)}
+.t h3,.c1 h3,.c2 h3,.c4 h3,.c5 h3{color:var(--act);opacity:1}
+.t h3 .ct{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.badge{background:var(--ac);color:var(--onac)}
+.av{box-shadow:inset 0 0 0 1px rgba(255,245,232,.14)}
+.pres{background:var(--ok);border-color:var(--tile)}
+.pill{box-shadow:inset 0 0 0 1px var(--line)}
+.pill.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd)}
+.chead .disp span{color:var(--act)}
+.day{color:var(--act);box-shadow:inset 0 0 0 1px var(--line)}
+.bub{box-shadow:inset 0 0 0 1px var(--line)}
+.bm.me .bub{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onmine);box-shadow:inset 0 -2px 0 var(--acd),0 6px 20px var(--glow)}
+.qt{border-left-color:var(--ac);background:var(--tile)}
+.rx{background:var(--tile)}
+.rx.mine{box-shadow:inset 0 0 0 2px var(--ac);background:var(--glow)}
+.dots i{background:var(--ac)}
+.comp{box-shadow:inset 0 0 0 1px var(--line)}
+.comp .in{box-shadow:0 0 0 3px var(--glow),inset 0 0 0 1px var(--acd)}
+.ph .comp{background:var(--tile);box-shadow:0 0 0 3px var(--glow),inset 0 0 0 1px var(--acd),0 8px 24px rgba(0,0,0,.25)}
+.seg{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.seg span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd)}
+.c2 .seg,.c1 .seg{background:var(--bg)}
+.thm .on{outline-color:var(--ac)}
+.fld{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.sv{box-shadow:inset 0 0 0 1px var(--line)}
+.mc,.chl,.ib{box-shadow:inset 0 0 0 1px var(--line)}
+.dm{border-color:var(--line)}
+.ph .dock{background:#201b17;box-shadow:0 10px 30px rgba(0,0,0,.4),inset 0 0 0 1px #3a3226}
+.ph .dock span{color:#d8c69e}
+.ph .dock span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac)}
+.toggle{background:var(--tile);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 4 4H6l4-4zM12 14v7"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1>Bento</h1><p>Un dock flottant et des tuiles arrondies. L'accueil est un tableau de bord, la conversation se lit en bulles avec les canaux en pastilles au-dessus, et chaque tuile d'options contient directement son réglage. Palette WireChat : tuiles brunes, une tuile ambre pour ce qui compte.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='light'?'dark':'light'">Changer de thème</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>01</b> · ACCUEIL : TABLEAU DE BORD</div>
+<div class="app">
+  <nav class="dock" aria-label="Navigation principale">
+    <div class="dk logo"><img src="logo.png" alt="WireChat"></div>
+    <div class="dk on" aria-label="Accueil"><svg class="i"><use href="#i-home"/></svg></div>
+    <div class="dsep"></div>
+    <div class="dk">ÉP</div><div class="dk">ÉT<span class="n">3</span></div><div class="dk">MU</div><div class="dk">JV<span class="n">12</span></div>
+    <div class="dk add" aria-label="Nouveau serveur"><svg class="i"><use href="#i-plus"/></svg></div>
+    <div class="end"><div class="dk" aria-label="Recherche"><svg class="i"><use href="#i-search"/></svg></div><div class="dk" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></div><div class="av b2 round">ZA</div></div>
+  </nav>
+  <div class="grid home">
+    <section class="t c3 hello">
+      <div><h2 class="disp">Salut Zack 👋</h2><p>Ana t'a écrit, Léa t'a mentionné dans #maquettes et Tom veut devenir ton ami.</p></div>
+      <div class="stats"><div><b class="big">15</b><span>messages non lus</span></div><div><b class="big">2</b><span>notifications</span></div><div><b class="big">3</b><span>amis en ligne</span></div></div>
+    </section>
+    <section class="t c4">
+      <h3>Demande d'ami <span class="ct">1</span></h3>
+      <div style="display:flex;gap:12px;align-items:center"><div class="av l b3">TO</div><div><b style="font-size:18px">Tom</b><div style="font-size:13px;opacity:.75;font-weight:600">Souhaite devenir ami</div></div></div>
+      <div style="display:flex;gap:8px;margin-top:16px"><button class="btn pri">Accepter</button><button class="btn" style="background:var(--tile)">Refuser</button></div>
+      <div style="margin-top:14px;font-size:13px;font-weight:700;opacity:.75">Nina · demande envoyée, en attente</div>
+    </section>
+    <section class="t">
+      <h3>Conversations privées <button class="ib" style="width:32px;height:32px;border-radius:10px" aria-label="Nouvelle conversation"><svg class="i" style="width:16px"><use href="#i-plus"/></svg></button></h3>
+      <div class="dm"><div class="av b1">AN<span class="pres"></span></div><div class="w"><b>Ana</b><span>On valide la maquette demain ?</span></div><span class="badge">2</span></div>
+      <div class="dm"><div class="av b3">ML</div><div class="w"><b>Marc, Léa</b><span>Léa : je vérifie le contraste</span></div><span class="badge">2</span></div>
+      <div class="dm"><div class="av b4">LÉ<span class="pres away"></span></div><div class="w"><b>Léa</b><span>Vous : Merci pour le lien !</span></div><time>Hier</time></div>
+      <div class="dm"><div class="av b2">SO<span class="pres off"></span></div><div class="w"><b>Sofia</b><span>On se reparle après l'examen</span></div><time>Lun.</time></div>
+    </section>
+    <section class="t online">
+      <h3>Amis en ligne <span class="ct">3</span></h3>
+      <div class="row">
+        <div class="f"><div class="av l b1 round">AN<span class="pres"></span></div>Ana</div>
+        <div class="f"><div class="av l b1 round">MA<span class="pres"></span></div>Marc</div>
+        <div class="f"><div class="av l b4 round">LÉ<span class="pres away"></span></div>Léa</div>
+      </div>
+      <button class="btn" style="margin-top:14px"><svg class="i"><use href="#i-plus"/></svg>Ajouter un contact</button>
+    </section>
+    <section class="t">
+      <h3>Notifications <span class="ct">2</span></h3>
+      <div class="dm"><div class="av s b4">LÉ</div><div class="w"><b>Mention dans #maquettes</b><span>Équipe projet · 14:11</span></div></div>
+      <div class="dm"><div class="av s b1">MA</div><div class="w"><b>Ajouté au serveur Études</b><span>Hier</span></div></div>
+    </section>
+    <section class="t" style="grid-column:1/-1;padding:16px 20px">
+      <h3 style="margin-bottom:10px">Tes serveurs</h3>
+      <div class="srvs" style="grid-template-columns:repeat(5,1fr)">
+        <div class="sv c1"><div class="av b2">ÉP</div><div>Équipe projet<small>4 canaux · 12 membres</small></div></div>
+        <div class="sv c2"><span class="badge">3</span><div class="av b3">ÉT</div><div>Études<small>6 canaux · 28 membres</small></div></div>
+        <div class="sv c3"><div class="av b1">MU</div><div>Musique<small>3 canaux · 9 membres</small></div></div>
+        <div class="sv c4"><span class="badge">12</span><div class="av b4">JV</div><div>Jeux vidéo<small>5 canaux · 41 membres</small></div></div>
+        <div class="sv" style="box-shadow:inset 0 0 0 2px var(--line);color:var(--mu)"><div class="av" style="background:var(--bg);color:var(--fg)">+</div><div>Nouveau serveur<small>Créer et inviter</small></div></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>02</b> · CONVERSATION : BULLES, CANAUX EN PASTILLES, MEMBRES DANS LA TUILE DE DROITE</div>
+<div class="app">
+  <nav class="dock" aria-label="Navigation principale">
+    <div class="dk logo"><img src="logo.png" alt="WireChat"></div>
+    <div class="dk" aria-label="Accueil"><svg class="i"><use href="#i-home"/></svg></div>
+    <div class="dsep"></div>
+    <div class="dk on">ÉP</div><div class="dk">ÉT<span class="n">3</span></div><div class="dk">MU</div><div class="dk">JV<span class="n">12</span></div>
+    <div class="dk add" aria-label="Nouveau serveur"><svg class="i"><use href="#i-plus"/></svg></div>
+    <div class="end"><div class="dk" aria-label="Recherche"><svg class="i"><use href="#i-search"/></svg></div><div class="dk" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></div><div class="av b2 round">ZA</div></div>
+  </nav>
+  <div class="grid conv">
+    <section class="t chat">
+      <div class="chead"><h2 class="disp">Équipe projet <span>/ maquettes</span></h2><div style="margin-left:auto;display:flex;gap:8px"><button class="ib" aria-label="Rechercher"><svg class="i"><use href="#i-search"/></svg></button><button class="ib" aria-label="Paramètres du serveur"><svg class="i"><use href="#i-gear"/></svg></button></div></div>
+      <div class="pills"><span class="pill"># général <span class="badge">4</span></span><span class="pill on"># maquettes</span><span class="pill"># annonces</span><span class="pill"># hors-sujet</span><span class="pill add">+ Canal</span></div>
+      <div class="msgs">
+        <span class="day">Aujourd'hui</span>
+        <div class="bm"><div class="av s b1">AN</div><div class="body"><span class="who">Ana<time>14:02</time></span><div class="bub">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><div class="rxs"><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div></div></div>
+        <div class="bm"><div class="av s b1">MA</div><div class="body"><span class="who">Marc<time>14:05</time></span><div class="bub">Oui, je prépare le résumé des retours.</div></div></div>
+        <div class="bm me"><div class="body"><span class="who">Toi<time>14:08 · modifié</time></span><div class="qt">↩ Ana : On valide la maquette demain ?</div><div class="bub">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div></div>
+        <div class="bm"><div class="av s b4">LÉ</div><div class="body"><span class="who">Léa<time>14:11</time></span><div class="bub"><b style="color:var(--act)">@Zack</b> je vérifie le contraste du thème clair ce soir.</div></div></div>
+      </div>
+      <div class="typing"><span class="dots"><i></i><i></i><i></i></span>Ana est en train d'écrire…</div>
+      <div class="comp">
+        <div class="rp"><svg class="i" style="width:16px"><use href="#i-reply"/></svg>Réponse à <b>Léa</b><button class="x" aria-label="Annuler la réponse"><svg class="i" style="width:14px"><use href="#i-x"/></svg></button></div>
+        <div class="in"><span>Écrire dans #maquettes</span><button class="ib" style="background:transparent" aria-label="Réaction"><svg class="i"><use href="#i-smile"/></svg></button><button class="btn acc">Envoyer<svg class="i" style="width:16px"><use href="#i-send"/></svg></button></div>
+      </div>
+    </section>
+    <aside class="side">
+      <section class="t c5" style="padding:16px 18px">
+        <h3><span>À propos du canal</span><svg class="i" style="width:16px"><use href="#i-pin"/></svg></h3>
+        <div style="font-weight:700">Les écrans et les retours de design.</div>
+        <div style="font-size:13px;font-weight:600;opacity:.75;margin-top:6px">Créé par Zack · 128 messages</div>
+      </section>
+      <section class="t">
+        <h3>Membres <span class="ct">12</span></h3>
+        <div style="font-size:12px;font-weight:800;color:var(--mu);margin:4px 0">EN LIGNE · 4</div>
+        <div class="mem"><div class="av s b2">ZA<span class="pres"></span></div><div>Zack<small>Propriétaire</small></div></div>
+        <div class="mem"><div class="av s b1">AN<span class="pres"></span></div><div>Ana<small>En train d'écrire…</small></div></div>
+        <div class="mem"><div class="av s b1">MA<span class="pres"></span></div>Marc</div>
+        <div class="mem"><div class="av s b4">LÉ<span class="pres away"></span></div><div>Léa<small>Inactive</small></div></div>
+        <div style="font-size:12px;font-weight:800;color:var(--mu);margin:10px 0 4px">HORS LIGNE · 8</div>
+        <div class="mem" style="opacity:.6"><div class="av s b2">SO</div>Sofia</div>
+        <div class="mem" style="opacity:.6"><div class="av s b3">TO</div>Tom</div>
+      </section>
+      <section class="t c2" style="padding:14px 18px;display:flex;align-items:center;gap:10px;font-weight:700"><svg class="i"><use href="#i-plus"/></svg>Inviter dans Équipe projet</section>
+    </aside>
+  </div>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>03</b> · OPTIONS : CHAQUE TUILE CONTIENT SON RÉGLAGE</div>
+<div class="app">
+  <nav class="dock" aria-label="Navigation principale">
+    <div class="dk logo"><img src="logo.png" alt="WireChat"></div>
+    <div class="dk" aria-label="Accueil"><svg class="i"><use href="#i-home"/></svg></div>
+    <div class="dsep"></div>
+    <div class="dk">ÉP</div><div class="dk">ÉT<span class="n">3</span></div><div class="dk">MU</div><div class="dk">JV<span class="n">12</span></div>
+    <div class="end"><div class="dk" aria-label="Recherche"><svg class="i"><use href="#i-search"/></svg></div><div class="dk" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></div><div class="av b2 round" style="outline:3px solid var(--fg);outline-offset:3px">ZA</div></div>
+  </nav>
+  <div class="grid sets">
+    <section class="t shead"><h2 class="disp">Options</h2><span style="color:var(--mu);font-weight:700">WireChat 1.3.1</span><div class="search"><svg class="i"><use href="#i-search"/></svg>Rechercher une option</div></section>
+    <section class="t c1 acct">
+      <h3 style="margin:0">Compte</h3>
+      <div style="display:flex;align-items:center;gap:14px"><div class="av l b2" style="width:76px;height:76px;font-size:28px;border-radius:24px">ZA</div><div><div class="disp" style="font-size:32px">Zack</div><div style="font-weight:700;opacity:.75">Actif</div></div></div>
+      <div class="fld"><small>Nom d'affichage</small><div>Zack <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div></div>
+      <div class="fld"><small>Courriel</small><div>zack@exemple.ca <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div></div>
+      <div style="margin-top:auto;display:flex;gap:8px"><button class="btn pri">Sauvegarder</button><button class="btn" style="background:var(--tile)">Se déconnecter</button></div>
+    </section>
+    <section class="t">
+      <h3>Notifications</h3>
+      <div style="font-weight:700;margin-bottom:10px">Messages des serveurs</div>
+      <div class="seg"><span>Aucune</span><span class="on">Mentions</span><span>Toutes</span></div>
+      <div class="opt" style="margin-top:12px"><div>Bureau<small>Autorisées dans le navigateur</small></div><div class="sw on" role="switch" aria-checked="true"></div></div>
+    </section>
+    <section class="t c2">
+      <h3>Thème</h3>
+      <div class="thm"><div style="background:#f5efe9"><span>Clair</span></div><div class="on" style="background:#100e0c"><span>Sombre</span></div><div style="background:linear-gradient(135deg,#f5efe9 50%,#100e0c 50%)"><span>Système</span></div></div>    </section>
+    <section class="t">
+      <h3>Accessibilité</h3>
+      <div class="opt"><div>Langue</div><span class="btn sm">Français ▾</span></div>
+      <div class="opt"><div>Réduire les animations<small>Points de saisie fixes</small></div><div class="sw on" role="switch" aria-checked="true"></div></div>
+    </section>
+    <section class="t c4" style="display:flex;flex-direction:column;justify-content:space-between">
+      <h3>Supprimer le compte</h3>
+      <div style="font-weight:600">Tes messages restent visibles, signés « Utilisateur supprimé ».</div>
+      <button class="btn danger" style="align-self:flex-start">Supprimer mon compte</button>
+    </section>
+  </div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>04</b> · PARAMÈTRES DU SERVEUR : APERÇU, MEMBRES, AJOUT ET CANAUX SUR UN SEUL ÉCRAN</div>
+<div class="app">
+  <nav class="dock" aria-label="Navigation principale">
+    <div class="dk logo"><img src="logo.png" alt="WireChat"></div>
+    <div class="dk" aria-label="Accueil"><svg class="i"><use href="#i-home"/></svg></div>
+    <div class="dsep"></div>
+    <div class="dk on">ÉP</div><div class="dk">ÉT<span class="n">3</span></div><div class="dk">MU</div><div class="dk">JV<span class="n">12</span></div>
+    <div class="dk add" aria-label="Nouveau serveur"><svg class="i"><use href="#i-plus"/></svg></div>
+    <div class="end"><div class="dk" aria-label="Recherche"><svg class="i"><use href="#i-search"/></svg></div><div class="dk" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></div><div class="av b2 round">ZA</div></div>
+  </nav>
+  <div class="grid srv">
+    <section class="t c1 ov">
+      <h3 style="margin:0">Aperçu</h3>
+      <div style="display:flex;align-items:center;gap:14px"><div class="av l b2">ÉP</div><h2 class="disp" style="font-size:36px">Équipe projet</h2></div>
+      <div class="in"><span>Équipe projet</span><button class="btn pri sm">Enregistrer</button></div>
+    </section>
+    <section class="t c3" style="display:flex;flex-direction:column;justify-content:space-between">
+      <h3 style="margin:0">En chiffres</h3>
+      <div class="stats"><div><b class="big">12</b><span>membres</span></div><div><b class="big">4</b><span>canaux</span></div><div><b class="big">1,2k</b><span>messages</span></div></div>
+    </section>
+    <section class="t c4" style="display:flex;flex-direction:column;justify-content:space-between">
+      <h3 style="margin:0">Zone sensible</h3>
+      <div style="font-weight:600">Supprime les canaux et leurs messages pour tous les membres.</div>
+      <button class="btn danger" style="align-self:flex-start">Supprimer le serveur</button>
+    </section>
+    <section class="t">
+      <h3>Membres <span class="ct">12</span></h3>
+      <div class="mgrid" style="grid-template-columns:1fr 1fr">
+        <div class="mc"><div class="av b2">ZA</div><div>Zack<small>Propriétaire du serveur</small></div></div>
+        <div class="mc"><div class="av b1">AN</div><div>Ana<small>Membre</small></div><button class="btn danger sm">Retirer</button></div>
+        <div class="mc"><div class="av b1">MA</div><div>Marc<small>Membre</small></div><button class="btn danger sm">Retirer</button></div>
+        <div class="mc"><div class="av b4">LÉ</div><div>Léa<small>Membre</small></div><button class="btn danger sm">Retirer</button></div>
+      </div>
+    </section>
+    <section class="t">
+      <h3>Canaux <span class="ct">4</span></h3>
+      <div class="chl"><span class="h">#</span><b>général</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl" style="box-shadow:inset 0 0 0 2px var(--ac)"><span class="h">#</span><b>maquettes</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl"><span class="h">#</span><b>annonces</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl"><span class="h">#</span><b>hors-sujet</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl" style="background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--mu)"><svg class="i"><use href="#i-plus"/></svg>Nouveau canal</div>
+    </section>
+    <section class="t c2">
+      <h3>Ajouter des membres</h3>
+      <div style="background:var(--tile);border-radius:999px;height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;color:var(--mu);margin-bottom:8px"><svg class="i"><use href="#i-search"/></svg>Chercher un ami</div>
+      <div class="cand"><div class="av s b3">TO</div><span>Tom</span><button class="btn pri sm">Ajouter</button></div>
+      <div class="cand"><div class="av s b4">NI</div><span>Nina</span><button class="btn sm" style="background:var(--tile)" disabled>Ajouté ✓</button></div>
+      <div class="cand"><div class="av s b1">JU</div><span>Jules</span><button class="btn pri sm">Ajouter</button></div>
+    </section>
+  </div>
+</div>
+</main>
+</body>
+</html>

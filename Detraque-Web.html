@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="fr" data-mode="nuit">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Détraqué web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nosifer&family=Rubik+Glitch&family=Rubik:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap">
+<style>
+html,body{margin:0}
+:root{--void:#050403;--bg:#100e0c;--sf:#17130f;--hi:#201b17;--fg:#f0ddb0;--mu:#a8987a;--line:#3a3226;--amb:#eab766;--amd:#d99a3f;--onamb:#231705;--rot:#c4573f;--rotl:#ff8a72;--ice:#b2e9eb;--ok:#23a55a;--flesh:#e9a58a}
+html[data-mode=jour] .board{filter:invert(1) hue-rotate(180deg)}
+html[data-mode=jour] body{background:#f0ddb0}
+html[data-mode=jour] .board img{filter:invert(1) hue-rotate(180deg)}
+body{background:var(--void);color:var(--fg);font-family:'Rubik',system-ui,sans-serif;padding:32px 24px 64px;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
+.board{max-width:1280px;margin:0 auto}
+.board>header{padding-top:36px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:28px}
+.drip{font-family:'Nosifer',cursive;color:var(--amb);text-shadow:-3px 0 var(--rot),3px 0 var(--ice);letter-spacing:.02em}
+.board h1{font-size:84px;line-height:1;margin:0;transform:skewX(-8deg) scaleY(1.25);transform-origin:left bottom;animation:jitter 3.2s infinite steps(1)}
+.board header p{margin:18px 0 0;color:var(--mu);max-width:62ch}
+.board header p b{color:var(--rotl)}
+.toggle{font:700 13px 'Space Mono',monospace;background:var(--rot);color:#fff5e8;border:0;padding:12px 16px;cursor:pointer;clip-path:polygon(0 8%,96% 0,100% 88%,4% 100%);text-transform:uppercase;letter-spacing:.1em}
+.cap{font:700 12px 'Space Mono',monospace;color:var(--mu);margin:48px 0 10px;text-transform:uppercase;letter-spacing:.14em}
+.cap b{color:var(--void);background:var(--amb);padding:1px 6px;margin-right:8px}
+.cap s{color:var(--rotl)}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mono{font-family:'Space Mono',monospace}
+.abs{position:absolute}
+
+@keyframes jitter{0%,100%{transform:skewX(-8deg) scaleY(1.25)}91%{transform:skewX(-8deg) scaleY(1.25) translateX(6px)}93%{transform:skewX(4deg) scaleY(1.1) translateX(-4px)}95%{transform:skewX(-8deg) scaleY(1.25)}}
+@keyframes glitch{0%,100%{clip-path:inset(0 0 0 0);transform:none}20%{clip-path:inset(10% 0 60% 0);transform:translate(-6px,0)}22%{clip-path:inset(55% 0 20% 0);transform:translate(6px,0)}24%{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes track{0%{transform:translateY(-120%)}100%{transform:translateY(900%)}}
+@keyframes marq{to{transform:translateX(-50%)}}
+@keyframes marqY{to{transform:translateY(-50%)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes ooze{0%{height:0}100%{height:var(--h,40px)}}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px) rotate(-1deg)}75%{transform:translate(2px,-1px) rotate(1deg)}}
+
+/* l'écran */
+.app{position:relative;width:1280px;height:800px;overflow:hidden;background:var(--bg);font-size:15px;line-height:1.45;
+  box-shadow:0 0 0 2px var(--line),0 0 0 8px var(--void),0 0 0 9px var(--rot),0 30px 80px rgba(196,87,63,.25);
+  background-image:radial-gradient(900px 600px at 50% 50%,transparent 40%,rgba(0,0,0,.65)),repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px)}
+.app:after{content:"";position:absolute;left:0;right:0;top:0;height:60px;background:linear-gradient(180deg,transparent,rgba(178,233,235,.06),rgba(234,183,102,.08),transparent);animation:track 6s linear infinite;pointer-events:none;z-index:50}
+.shard{position:absolute;background:var(--sf);border:0;padding:18px 22px;box-sizing:border-box;color:var(--fg)}
+.shard:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(234,183,102,.10),transparent 40%);pointer-events:none;clip-path:inherit}
+.h{font-family:'Rubik Glitch',sans-serif;font-weight:400;font-size:30px;line-height:1;margin:0 0 10px;color:var(--fg);text-shadow:-2px 0 var(--rot),2px 0 var(--ice)}
+.h.g{animation:glitch 4s infinite steps(1)}
+.label{font:700 11px 'Space Mono',monospace;color:var(--amb);text-transform:uppercase;letter-spacing:.14em}
+.drips{position:absolute;left:0;right:0;bottom:-1px;height:0;pointer-events:none}
+.drips i{position:absolute;top:0;width:var(--w,12px);height:var(--h,40px);background:var(--c,var(--amb));border-radius:0 0 999px 999px;animation:ooze 3s ease-out both}
+.drips i:after{content:"";position:absolute;left:50%;bottom:-8px;width:calc(var(--w,12px) * .9);height:calc(var(--w,12px) * .9);transform:translateX(-50%);border-radius:50%;background:inherit}
+
+.ticker{position:absolute;left:0;right:0;top:0;height:30px;background:var(--amb);color:var(--onamb);overflow:hidden;z-index:20;font:700 13px 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid var(--void)}
+.ticker div{display:inline-flex;white-space:nowrap;gap:40px;padding-top:6px;animation:marq 22s linear infinite}
+.ticker em{font-style:normal;color:var(--rot)}
+
+/* serveurs : colonne qui défile à la verticale */
+.spine{position:absolute;left:0;top:30px;bottom:0;width:86px;background:var(--void);overflow:hidden;border-right:2px solid var(--rot);z-index:10}
+.spine .track{display:flex;flex-direction:column;align-items:center;gap:18px;padding:16px 0;animation:marqY 30s linear infinite}
+.sv{position:relative;width:56px;height:56px;display:grid;place-items:center;font:400 18px 'Rubik Glitch';color:var(--fg);background:var(--hi);clip-path:polygon(10% 0,100% 6%,92% 100%,0 90%);cursor:pointer}
+.sv.on{background:var(--amb);color:var(--onamb)}
+.sv .n{position:absolute;right:2px;top:2px;font:700 10px 'Space Mono';background:var(--rot);color:#fff5e8;padding:0 3px}
+.spine:after{content:"SERVEURS";position:absolute;left:50%;bottom:16px;transform:translateX(-50%) rotate(180deg);writing-mode:vertical-rl;font:700 10px 'Space Mono';letter-spacing:.3em;color:var(--rot);background:var(--void);padding:6px 2px}
+
+/* œil géant */
+.eye{position:absolute;width:260px;height:160px;background:radial-gradient(ellipse at center,#fff5e8 0 58%,#e9c9a8 72%,var(--flesh) 100%);border-radius:50%/50%;box-shadow:0 0 0 6px var(--void),0 0 0 8px var(--rot),0 0 60px rgba(196,87,63,.4);overflow:hidden;animation:blink 5s infinite;z-index:5}
+.eye:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 6deg,rgba(196,87,63,.25) 6deg 7deg);mask:radial-gradient(ellipse,transparent 40%,#000 70%)}
+.iris{position:absolute;left:calc(50% - 46px + var(--ex,0px));top:calc(50% - 46px + var(--ey,0px));width:92px;height:92px;border-radius:50%;background:radial-gradient(circle,var(--void) 0 22%,#7a4a10 24%,var(--amb) 50%,var(--amd) 70%,#5c3a10 100%);box-shadow:0 0 0 3px var(--void)}
+.iris:after{content:"";position:absolute;left:22%;top:20%;width:16px;height:16px;border-radius:50%;background:#fff}
+
+.av{position:relative;width:40px;height:40px;flex:none;display:grid;place-items:center;font:700 13px 'Space Mono';color:var(--onamb);clip-path:polygon(0 12%,88% 0,100% 82%,14% 100%)}
+.av.s{width:30px;height:30px;font-size:10px}
+.av.l{width:60px;height:60px;font-size:18px}
+.c1{background:#d49a42}.c2{background:#a96328;color:#fff5e8}.c3{background:#c98a2e}.c4{background:#b2e9eb}.c5{background:#e9a58a}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block;box-shadow:0 0 8px var(--ok)}
+.dot.away{background:var(--amb);box-shadow:0 0 8px var(--amb)}
+.dot.off{background:var(--line);box-shadow:none}
+.row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border:0}
+.row .w{flex:1;min-width:0}
+.row .w b{font-weight:700}
+.row .w small{display:block;color:var(--mu);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row:hover{background:rgba(234,183,102,.06)}
+.cnt{font:700 11px 'Space Mono';background:var(--rot);color:#fff5e8;padding:1px 6px}
+.cnt.a{background:var(--amb);color:var(--onamb)}
+.btn{font:700 13px 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.06em;height:36px;padding:0 14px;border:2px solid var(--fg);background:transparent;color:var(--fg);display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.btn:hover{animation:shake .2s infinite}
+.btn.a{background:var(--amb);color:var(--onamb);border-color:var(--amb);box-shadow:-3px 0 var(--rot),3px 0 var(--ice)}
+.btn.r{background:var(--rot);color:#fff5e8;border-color:var(--rot)}
+.btn.sm{height:28px;font-size:11px;padding:0 9px}
+
+/* conversation */
+.msg{position:absolute;max-width:440px}
+.msg .who{font:700 12px 'Space Mono';color:var(--amb);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;display:flex;gap:8px;align-items:center}
+.msg .who time{color:var(--mu)}
+.msg .txt{background:var(--sf);padding:12px 16px;font-size:16px;border-left:4px solid var(--amb);clip-path:polygon(0 0,100% 4%,98% 100%,2% 94%)}
+.msg.me .txt{background:var(--amb);color:var(--onamb);border-left:0;border-right:4px solid var(--rot)}
+.msg.me .who{justify-content:flex-end}
+.msg.bad .txt{background:transparent;border:2px dashed var(--rot);color:var(--mu);animation:glitch 2.4s infinite steps(1)}
+.rx{display:inline-flex;gap:4px;align-items:center;font:700 12px 'Space Mono';border:1px solid var(--line);padding:1px 8px;margin:6px 4px 0 0;background:var(--void)}
+.rx.mine{border-color:var(--amb);color:var(--amb)}
+.ment{background:var(--rot);color:#fff5e8;padding:0 4px;font-weight:700}
+.q{font:400 12px 'Space Mono';color:var(--mu);margin-bottom:6px}
+.mouth{position:absolute;background:#2a0d08;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;box-shadow:0 0 0 5px var(--rot),0 0 0 9px var(--void),0 20px 50px rgba(196,87,63,.4);overflow:hidden}
+.teeth{position:absolute;left:8%;right:8%;height:22px;background:repeating-linear-gradient(90deg,#fff5e8 0 26px,#2a0d08 26px 30px);clip-path:polygon(0 0,100% 0,100% 40%,97% 100%,94% 40%,91% 100%,88% 40%,85% 100%,82% 40%,79% 100%,76% 40%,73% 100%,70% 40%,67% 100%,64% 40%,61% 100%,58% 40%,55% 100%,52% 40%,49% 100%,46% 40%,43% 100%,40% 40%,37% 100%,34% 40%,31% 100%,28% 40%,25% 100%,22% 40%,19% 100%,16% 40%,13% 100%,10% 40%,7% 100%,4% 40%,0 100%)}
+.teeth.b{bottom:0;transform:scaleY(-1)}
+.tongue{position:absolute;left:50%;bottom:-30px;width:180px;height:70px;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 20%,#e98a7a,#a83a2a);border-radius:50%}
+.field{position:absolute;left:12%;right:12%;top:50%;transform:translateY(-50%);height:46px;background:var(--bg);border:2px solid var(--amb);display:flex;align-items:center;padding:0 14px;color:var(--mu);font-size:15px;z-index:2}
+.field kbd{margin-left:auto;font:700 11px 'Space Mono';color:var(--amb)}
+
+/* options */
+.opt{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:center;padding:14px 0;border-bottom:1px dashed var(--line)}
+.opt:nth-child(odd){transform:skewX(-4deg)}
+.opt:nth-child(even){transform:skewX(3deg)}
+.opt b{font:400 20px 'Rubik Glitch';color:var(--fg)}
+.opt small{display:block;color:var(--mu);font-size:13px}
+.inp{height:40px;background:var(--void);border:2px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:'Space Mono';max-width:360px}
+.eyesw{position:relative;width:64px;height:34px;background:#fff5e8;border-radius:50%;box-shadow:0 0 0 3px var(--void),0 0 0 4px var(--line);overflow:hidden;display:inline-block;vertical-align:middle}
+.eyesw:after{content:"";position:absolute;left:18px;top:3px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,var(--void) 0 25%,var(--amb) 30% 70%,#5c3a10 100%)}
+.eyesw.off{background:var(--flesh)}
+.eyesw.off:after{left:0;right:0;top:50%;width:auto;height:3px;border-radius:0;background:var(--void)}
+.melt{display:flex;gap:12px}
+.melt div{position:relative;width:96px;height:70px;font:700 12px 'Space Mono';display:flex;align-items:flex-start;padding:8px;box-sizing:border-box;text-transform:uppercase}
+.melt div.on{outline:3px solid var(--amb);outline-offset:4px}
+.radio{display:flex;gap:10px}
+.radio span{font:700 12px 'Space Mono';text-transform:uppercase;padding:8px 12px;border:2px solid var(--line);color:var(--mu)}
+.radio span.on{border-color:var(--amb);background:var(--amb);color:var(--onamb);box-shadow:-3px 0 var(--rot),3px 0 var(--ice)}
+
+/* affiches disparues */
+.poster{position:absolute;width:190px;background:#e8dcc4;color:#1a140c;padding:12px;box-sizing:border-box;font-family:'Space Mono',monospace;text-align:center;box-shadow:6px 8px 0 rgba(0,0,0,.5);filter:contrast(1.3) grayscale(.35)}
+.poster h4{margin:0;font:400 22px 'Rubik Glitch';letter-spacing:.04em;color:#1a140c}
+.poster .ph{height:110px;margin:6px 0;display:grid;place-items:center;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px),#c9b994;border:2px solid #1a140c}
+.poster .ph .av{width:72px;height:72px;font-size:22px;filter:grayscale(.6)}
+.poster b{display:block;font-size:17px}
+.poster small{display:block;font-size:11px;margin:2px 0 8px}
+.poster .btn{border-color:#1a140c;color:#a22a2a;width:100%;justify-content:center}
+.poster:before{content:"";position:absolute;left:50%;top:-8px;width:60px;height:18px;transform:translateX(-50%) rotate(-4deg);background:rgba(240,221,176,.6)}
+.tear{clip-path:polygon(0 0,100% 0,100% 92%,94% 100%,86% 93%,77% 100%,68% 94%,58% 100%,49% 93%,40% 100%,30% 94%,20% 100%,10% 93%,0 100%)}
+.nuke{position:absolute;display:grid;place-items:center;text-align:center;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff9a8a,var(--rot) 55%,#5a1a0e);box-shadow:0 0 0 6px var(--void),0 0 0 9px var(--amb),0 0 80px rgba(196,87,63,.6);font:400 22px 'Nosifer';color:#fff5e8;animation:pulse 1.4s ease-in-out infinite;cursor:pointer}
+
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1 class="drip">Détraqué</h1>
+  <p>WireChat après minuit, quand la cassette VHS a fondu. Les serveurs défilent tout seuls, un œil te surveille à l'accueil, la barre de saisie a des dents et les membres sont des affiches de disparus. <b>Ça reste utilisable</b> : le texte des messages est net, seul le décor est possédé.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.mode=h.dataset.mode==='nuit'?'jour':'nuit'">inverser la réalité</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>01</b>accueil <s>// il te regarde</s></div>
+<div class="app">
+  <div class="ticker"><div><span>★ 15 messages non lus</span><span>tom veut devenir ton ami <em>!!</em></span><span>léa t'a mentionné dans #maquettes</span><span>marc t'a ajouté à études</span><span>3 amis en ligne</span><span>wirechat 1.3.1</span><span>★ 15 messages non lus</span><span>tom veut devenir ton ami <em>!!</em></span><span>léa t'a mentionné dans #maquettes</span><span>marc t'a ajouté à études</span><span>3 amis en ligne</span><span>wirechat 1.3.1</span></div></div>
+  <nav class="spine" aria-label="Serveurs"><div class="track">
+    <img src="logo.png" alt="WireChat" style="width:50px;height:50px;object-fit:contain;filter:sepia(1) saturate(2) hue-rotate(-15deg) contrast(1.4)">
+    <div class="sv on">⌂</div><div class="sv">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div><div class="sv">+</div>
+    <div class="sv on">⌂</div><div class="sv">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div><div class="sv">+</div>
+  </div></nav>
+
+  <div class="abs drip" style="left:130px;top:60px;font-size:58px;transform:skewX(-10deg) scaleY(1.3);transform-origin:left top">salut zack</div>
+  <div class="abs mono" style="left:136px;top:150px;color:var(--mu);font-size:13px">lundi 17 nov. · 03:33 · tu ne dors pas ?</div>
+
+  <div class="eye" style="left:520px;top:290px"><div class="iris"></div></div>
+  <div class="abs mono" style="left:520px;top:470px;width:260px;text-align:center;color:var(--rot);font-size:11px;letter-spacing:.18em;text-transform:uppercase">l'œil voit 3 amis en ligne</div>
+
+  <section class="shard" style="left:120px;top:200px;width:380px;height:300px;clip-path:polygon(0 4%,94% 0,100% 88%,62% 100%,4% 94%)">
+    <div class="label">amis // 3 en ligne</div>
+    <h2 class="h g">LES VIVANTS</h2>
+    <div class="row"><div class="av c1">AN</div><div class="w"><b>Ana</b><small><span class="dot"></span> en ligne</small></div><span class="btn sm">écrire</span></div>
+    <div class="row"><div class="av c2">MA</div><div class="w"><b>Marc</b><small><span class="dot"></span> en ligne</small></div><span class="btn sm">écrire</span></div>
+    <div class="row"><div class="av c4">LÉ</div><div class="w"><b>Léa</b><small><span class="dot away"></span> inactive</small></div><span class="btn sm">écrire</span></div>
+  </section>
+  <section class="shard" style="left:140px;top:520px;width:340px;height:250px;background:var(--hi);clip-path:polygon(6% 0,100% 8%,96% 100%,0 92%)">
+    <div class="label" style="color:var(--mu)">hors ligne // 2</div>
+    <h2 class="h" style="font-size:24px;color:var(--mu)">LES ABSENTS</h2>
+    <div class="row" style="opacity:.6"><div class="av c5">SO</div><div class="w"><b>Sofia</b><small><span class="dot off"></span> indisponible hors ligne</small></div></div>
+    <div class="row" style="opacity:.6"><div class="av c3">NI</div><div class="w"><b>Nina</b><small>demande envoyée… elle n'a pas répondu</small></div></div>
+    <span class="btn sm" style="margin-top:8px"><svg class="i" style="width:14px"><use href="#i-plus"/></svg>invoquer un contact</span>
+  </section>
+
+  <section class="shard" style="left:820px;top:56px;width:420px;height:200px;background:var(--rot);color:#fff5e8;clip-path:polygon(0 0,100% 10%,95% 100%,3% 86%)">
+    <div class="label" style="color:#fff5e8">demande d'ami // 1</div>
+    <div style="display:flex;gap:14px;align-items:center;margin:10px 0 14px"><div class="av l c3">TO</div><div><div class="h" style="font-size:34px;margin:0;color:#fff5e8;text-shadow:-2px 0 var(--void),2px 0 var(--ice)">TOM</div><div style="font-weight:700">veut devenir ton ami. il insiste.</div></div></div>
+    <div style="display:flex;gap:10px"><span class="btn a">accepter</span><span class="btn" style="border-color:#fff5e8;color:#fff5e8">refuser</span></div>
+    <div class="drips"><i style="left:12%;--h:46px;--c:var(--rot)"></i><i style="left:38%;--h:28px;--w:9px;--c:var(--rot)"></i><i style="left:71%;--h:60px;--c:var(--rot)"></i></div>
+  </section>
+
+  <section class="shard" style="left:830px;top:320px;width:410px;height:450px;clip-path:polygon(4% 0,100% 4%,96% 96%,0 100%)">
+    <div class="label">messages privés // 4</div>
+    <h2 class="h">CHUCHOTEMENTS</h2>
+    <div class="row"><div class="av c1">AN</div><div class="w"><b>Ana</b><small>On valide la maquette demain ?</small></div><span class="cnt">2</span></div>
+    <div class="row"><div class="av c3">ML</div><div class="w"><b>Marc, Léa</b><small>Léa : je vérifie le contraste</small></div><span class="cnt">2</span></div>
+    <div class="row"><div class="av c4">LÉ</div><div class="w"><b>Léa</b><small>Vous : Merci pour le lien !</small></div></div>
+    <div class="row"><div class="av c5">SO</div><div class="w"><b>Sofia</b><small>On se reparle après l'examen</small></div></div>
+    <div class="label" style="margin-top:16px;color:var(--rotl)">notifications // 2</div>
+    <div class="row"><div class="w"><b>Léa</b> t'a mentionné dans <span class="ment">#maquettes</span><small>Équipe projet · 14:11</small></div></div>
+    <div class="row"><div class="w"><b>Marc</b> t'a ajouté à <b>Études</b><small>hier</small></div></div>
+  </section>
+  <div class="abs mono" style="left:540px;top:640px;width:240px;text-align:center;color:var(--mu);font-size:12px;letter-spacing:.4em;transform:rotate(-4deg)">NE CLIGNE PAS DES YEUX</div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>02</b>conversation <s>// ça descend en escalier</s></div>
+<div class="app">
+  <nav class="spine" aria-label="Serveurs"><div class="track">
+    <img src="logo.png" alt="WireChat" style="width:50px;height:50px;object-fit:contain;filter:sepia(1) saturate(2) hue-rotate(-15deg) contrast(1.4)">
+    <div class="sv">⌂</div><div class="sv on">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div>
+    <div class="sv">⌂</div><div class="sv on">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div>
+  </div></nav>
+  <!-- canaux : onglets à la verticale sur le bord droit -->
+  <div class="abs" style="right:0;top:0;bottom:0;width:62px;background:var(--void);border-left:2px solid var(--amb);display:flex;flex-direction:column;z-index:10">
+    <div style="writing-mode:vertical-rl;font:700 13px 'Space Mono';padding:16px 0;text-align:center;color:var(--mu);border-bottom:1px solid var(--line);height:150px;box-sizing:border-box"># général <span class="cnt">4</span></div>
+    <div style="writing-mode:vertical-rl;font:700 13px 'Space Mono';padding:16px 0;text-align:center;background:var(--amb);color:var(--onamb);height:170px;box-sizing:border-box;box-shadow:-4px 0 var(--rot)"># maquettes</div>
+    <div style="writing-mode:vertical-rl;font:700 13px 'Space Mono';padding:16px 0;text-align:center;color:var(--mu);border-bottom:1px solid var(--line);height:150px;box-sizing:border-box"># annonces</div>
+    <div style="writing-mode:vertical-rl;font:700 13px 'Space Mono';padding:16px 0;text-align:center;color:var(--mu);border-bottom:1px solid var(--line);height:150px;box-sizing:border-box"># hors-sujet</div>
+    <div style="flex:1;display:grid;place-items:center;color:var(--amb)"><svg class="i"><use href="#i-plus"/></svg></div>
+  </div>
+
+  <div class="abs drip" style="left:120px;top:18px;font-size:52px;transform:skewX(-10deg)">#maquettes</div>
+  <div class="abs mono" style="left:124px;top:90px;color:var(--mu);font-size:12px;text-transform:uppercase;letter-spacing:.12em">équipe projet · 4 âmes en ligne sur 12 · <span style="color:var(--amb)">aujourd'hui</span></div>
+  <div class="abs" style="left:900px;top:30px;display:flex;gap:6px"><div class="av s c2">ZA</div><div class="av s c1">AN</div><div class="av s c2">MA</div><div class="av s c4">LÉ</div><span class="mono" style="color:var(--mu);font-size:11px;align-self:center">+8</span></div>
+
+  <div class="msg" style="left:130px;top:140px;transform:skewY(-2deg)"><div class="who"><div class="av s c1">AN</div>ana<time>14:02</time></div><div class="txt">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div>
+  <div class="msg" style="left:300px;top:262px;transform:skewY(1.5deg)"><div class="who"><div class="av s c2">MA</div>marc<time>14:05</time></div><div class="txt">Oui, je prépare le résumé des retours.</div></div>
+  <div class="msg me" style="left:480px;top:350px;transform:skewY(-1.5deg)"><div class="who"><time>14:08 · modifié</time>toi<div class="av s c2">ZA</div></div><div class="q">↳ ana : On valide la maquette demain ?</div><div class="txt">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div>
+  <div class="msg" style="left:640px;top:470px;transform:skewY(2deg)"><div class="who"><div class="av s c4">LÉ</div>léa<time>14:11</time></div><div class="txt"><span class="ment">@Zack</span> je vérifie le contraste du thème clair ce soir.</div></div>
+  <div class="msg me bad" style="left:130px;top:478px;max-width:330px"><div class="txt">Je les envoie à Léa aussi.</div><div class="mono" style="font-size:12px;color:var(--rotl);margin-top:6px">✕ le message s'est perdu dans le vide <span class="btn sm r" style="margin-left:6px">réessayer</span></div></div>
+  <div class="abs mono" style="left:520px;top:572px;color:var(--amb);font-size:13px;letter-spacing:.1em">ana est en train d'écrire<span style="animation:blink 1s infinite">▮</span></div>
+
+  <div class="mouth" style="left:180px;top:610px;width:860px;height:170px">
+    <div class="teeth" style="top:0"></div><div class="teeth b"></div><div class="tongue"></div>
+    <div class="field"><span style="color:var(--amb);font:700 12px 'Space Mono';margin-right:10px">↩ réponse à léa ✕</span>nourris la bouche…<kbd>ENTRÉE</kbd></div>
+  </div>
+  <span class="btn a abs" style="left:1060px;top:670px;height:52px;z-index:3"><svg class="i"><use href="#i-send"/></svg>avaler</span>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>03</b>options <s>// étiquette d'avertissement</s></div>
+<div class="app" style="background-color:#130f0b">
+  <div class="abs" style="left:0;right:0;top:0;height:46px;background:repeating-linear-gradient(-45deg,var(--amb) 0 26px,var(--void) 26px 52px)"></div>
+  <div class="abs" style="left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(-45deg,var(--amb) 0 26px,var(--void) 26px 52px)"></div>
+  <div class="abs drip" style="left:60px;top:66px;font-size:64px;transform:skewX(-12deg) scaleY(1.2);transform-origin:left top">options</div>
+  <div class="abs mono" style="left:66px;top:156px;color:var(--rotl);font-size:12px;letter-spacing:.2em;text-transform:uppercase">⚠ ne pas toucher sans adulte · wirechat 1.3.1 · c4-beta-3</div>
+
+  <div class="abs" style="left:60px;top:200px;width:720px">
+    <div class="opt"><div><b>NOM</b><small>visible par tes amis et tes serveurs</small></div><div class="inp">Zack <svg class="i"><use href="#i-pen"/></svg></div></div>
+    <div class="opt"><div><b>COURRIEL</b></div><div class="inp">zack@exemple.ca <svg class="i"><use href="#i-pen"/></svg></div></div>
+    <div class="opt"><div><b>NOTIFICATIONS</b><small>ce qui peut te réveiller</small></div><div class="radio"><span>aucune</span><span class="on">mentions</span><span>toutes</span></div></div>
+    <div class="opt"><div><b>LANGUE</b></div><div class="inp" style="max-width:200px">Français ▾</div></div>
+    <div class="opt"><div><b>CALMER LES YEUX</b><small>réduire les animations · œil ouvert = activé</small></div><div><span class="eyesw" role="switch" aria-checked="true"></span> <span class="mono" style="font-size:12px;color:var(--amb);margin-left:8px">ACTIVÉ</span></div></div>
+    <div class="opt"><div><b>BUREAU</b><small>notifications du navigateur</small></div><div><span class="eyesw off" role="switch" aria-checked="false"></span> <span class="mono" style="font-size:12px;color:var(--mu);margin-left:8px">DORT</span></div></div>
+  </div>
+
+  <section class="shard" style="left:830px;top:190px;width:420px;height:250px;clip-path:polygon(0 6%,100% 0,96% 100%,4% 94%)">
+    <div class="label">thème</div>
+    <h2 class="h g" style="font-size:26px">CHOISIS TA FONTE</h2>
+    <div class="melt">
+      <div style="background:#f5efe9;color:#201b17">clair<div class="drips"><i style="left:20%;--h:34px;--c:#f5efe9"></i><i style="left:65%;--h:22px;--w:8px;--c:#f5efe9"></i></div></div>
+      <div class="on" style="background:#100e0c;color:#f0ddb0;border:1px solid var(--line)">sombre<div class="drips"><i style="left:30%;--h:40px;--c:#100e0c"></i><i style="left:75%;--h:26px;--w:9px;--c:#100e0c"></i></div></div>
+      <div style="background:linear-gradient(90deg,#f5efe9 50%,#100e0c 50%);color:#c4573f">système<div class="drips"><i style="left:45%;--h:44px;--c:#c4573f;--w:10px"></i></div></div>
+    </div>
+  </section>
+  <div class="abs" style="left:870px;top:480px;display:flex;gap:12px"><span class="btn a">sauvegarder</span><span class="btn">se déconnecter</span></div>
+  <section class="shard" style="left:850px;top:560px;width:390px;height:170px;background:repeating-linear-gradient(-45deg,rgba(196,87,63,.25) 0 14px,transparent 14px 28px),var(--sf);clip-path:polygon(4% 0,100% 8%,96% 100%,0 90%)">
+    <div class="label" style="color:var(--rotl)">zone sensible</div>
+    <div style="margin:8px 0 12px;font-weight:700">Supprimer ton compte. Pour toujours. Il n'y a pas de retour.</div>
+    <span class="btn r">supprimer le compte</span>
+  </section>
+  <div class="eye" style="left:620px;top:600px;width:150px;height:92px;transform:rotate(-12deg)"><div class="iris" style="width:56px;height:56px;left:calc(50% - 28px + var(--ex,0px));top:calc(50% - 28px + var(--ey,0px))"></div></div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>04</b>paramètres du serveur <s>// avis de recherche</s></div>
+<div class="app">
+  <nav class="spine" aria-label="Serveurs"><div class="track">
+    <img src="logo.png" alt="WireChat" style="width:50px;height:50px;object-fit:contain;filter:sepia(1) saturate(2) hue-rotate(-15deg) contrast(1.4)">
+    <div class="sv">⌂</div><div class="sv on">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div>
+    <div class="sv">⌂</div><div class="sv on">ÉP</div><div class="sv">ÉT<span class="n">3</span></div><div class="sv">MU</div><div class="sv">JV<span class="n">12</span></div>
+  </div></nav>
+  <div class="abs drip" style="left:120px;top:20px;font-size:50px;transform:skewX(-10deg)">équipe projet</div>
+  <div class="abs mono" style="left:124px;top:90px;color:var(--mu);font-size:12px;text-transform:uppercase;letter-spacing:.12em">12 membres · 4 canaux · <span style="color:var(--amb)">tu es le propriétaire</span> · <u>← retour aux canaux</u></div>
+  <div class="abs" style="left:124px;top:120px;display:flex;gap:0">
+    <span class="btn" style="border-right:0">aperçu</span><span class="btn a">membres</span><span class="btn" style="border-left:0">ajouter</span><span class="btn" style="border-left:0">canaux</span>
+  </div>
+
+  <div class="poster tear" style="left:130px;top:200px;transform:rotate(-4deg)"><h4>PROPRIO</h4><div class="ph"><div class="av c2">ZA</div></div><b>ZACK</b><small>propriétaire du serveur · en ligne</small><span class="mono" style="font-size:11px">intouchable</span></div>
+  <div class="poster tear" style="left:340px;top:180px;transform:rotate(3deg)"><h4>DISPARUE?</h4><div class="ph"><div class="av c1">AN</div></div><b>ANA</b><small>membre · en ligne</small><span class="btn sm">retirer</span></div>
+  <div class="poster tear" style="left:550px;top:210px;transform:rotate(-2deg)"><h4>DISPARU?</h4><div class="ph"><div class="av c2">MA</div></div><b>MARC</b><small>membre · en ligne</small><span class="btn sm">retirer</span></div>
+  <div class="poster tear" style="left:240px;top:480px;transform:rotate(5deg)"><h4>VUE ENDORMIE</h4><div class="ph" style="height:80px"><div class="av c4">LÉ</div></div><b>LÉA</b><small>membre · inactive</small><span class="btn sm">retirer</span></div>
+  <div class="poster tear" style="left:460px;top:500px;transform:rotate(-6deg)"><h4>INTROUVABLE</h4><div class="ph" style="height:80px"><div class="av c5">SO</div></div><b>SOFIA</b><small>membre · hors ligne</small><span class="btn sm">retirer</span></div>
+  <div class="abs mono" style="left:150px;top:752px;color:var(--mu);font-size:12px;transform:rotate(-3deg)">+7 autres affiches sous la pile</div>
+
+  <section class="shard" style="left:790px;top:140px;width:450px;height:340px;clip-path:polygon(0 4%,100% 0,97% 100%,3% 95%)">
+    <div class="label">canaux // 4</div>
+    <h2 class="h" style="font-size:24px">CANAUX</h2>
+    <div class="row"><b class="mono" style="flex:1"># général</b><span class="btn sm" aria-label="Renommer"><svg class="i" style="width:14px"><use href="#i-pen"/></svg></span><span class="btn sm" aria-label="Supprimer"><svg class="i" style="width:14px"><use href="#i-trash"/></svg></span></div>
+    <div class="row"><span class="inp" style="flex:1;height:32px;border-color:var(--amb)">maquettes-v2</span><span class="btn sm a">ok</span></div>
+    <div class="row"><b class="mono" style="flex:1"># annonces</b><span class="btn sm"><svg class="i" style="width:14px"><use href="#i-pen"/></svg></span><span class="btn sm"><svg class="i" style="width:14px"><use href="#i-trash"/></svg></span></div>
+    <div class="row"><b class="mono" style="flex:1"># hors-sujet</b><span class="btn sm"><svg class="i" style="width:14px"><use href="#i-pen"/></svg></span><span class="btn sm"><svg class="i" style="width:14px"><use href="#i-trash"/></svg></span></div>
+    <div class="row"><span class="inp" style="flex:1;height:32px;color:var(--mu)">nouveau canal…</span><span class="btn sm">créer</span></div>
+  </section>
+  <div class="nuke" style="left:880px;top:510px;width:230px;height:230px">sup&shy;primer<br>le<br>serveur</div>
+  <div class="abs mono" style="left:1100px;top:500px;color:var(--rotl);font-size:13px;line-height:1.6;transform:rotate(8deg)">t'es sûr ?<br>t'es sûr ?<br>t'es VRAIMENT sûr ?</div>
+</div>
+</main>
+<script>
+// L'œil et les iris suivent la souris (désactivé si l'utilisateur réduit les animations).
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var eyes=document.querySelectorAll('.eye');
+  document.addEventListener('mousemove',function(e){
+    eyes.forEach(function(el){
+      var r=el.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy)||1,k=Math.min(1,d/300);
+      el.style.setProperty('--ex',(dx/d*r.width*.22*k)+'px');el.style.setProperty('--ey',(dy/d*r.height*.18*k)+'px');
+    });
+  });
+})();
+</script>
+</body>
+</html>

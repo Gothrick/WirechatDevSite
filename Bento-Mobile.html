@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bento mobile - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=light]{--page:#E6DCCB;--bg:#f0eee8;--tile:#ffffff;--fg:#201b17;--mu:#6f6553;--line:#e0d3bf;--act:#8a6a2a;--al:#a22a2a;--t1:#e8d7b4;--t2:#f3ebe0;--t3:#eab766;--t4:#f3dcc4;--t5:#f7f1e8;--bub:#f3ebe0;--mine:#eab766;--onmine:#231705;--glow:rgba(234,183,102,.25);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+[data-theme=dark]{--page:#0A0806;--bg:#100e0c;--tile:#1f1a14;--fg:#f0ddb0;--mu:#9c8f74;--line:#3a3226;--act:#eab766;--al:#e08a72;--t1:#5c4520;--t2:#2b241b;--t3:#eab766;--t4:#3a2416;--t5:#241d18;--bub:#2b241b;--mine:#eab766;--onmine:#231705;--glow:rgba(234,183,102,.16);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+body{background:var(--page);color:var(--fg);font-family:'Nunito Sans',system-ui,sans-serif;padding:32px 24px 64px}
+.board{max-width:1720px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.board h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:52px;line-height:1;margin:0;letter-spacing:-.02em}
+.board header p{margin:6px 0 0;color:var(--mu);max-width:62ch}
+.toggle{font:700 14px 'Nunito Sans',sans-serif;background:var(--tile);color:var(--fg);border:0;border-radius:999px;padding:12px 18px;cursor:pointer}
+.phones{display:flex;gap:32px;flex-wrap:wrap}
+.cap{font:800 13px 'Nunito Sans',sans-serif;color:var(--mu);margin:0 0 10px;letter-spacing:.06em}
+.cap b{color:var(--fg)}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.ph{width:390px;height:800px;background:var(--bg);border-radius:40px;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.14);font-size:15px;line-height:1.45}
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-weight:800;font-size:14px;flex:none}
+.scroll{flex:1;min-height:0;overflow:hidden;padding:0 14px 110px;display:flex;flex-direction:column;gap:10px}
+.disp{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1;margin:0}
+.t{background:var(--tile);border-radius:22px;padding:14px 16px;min-width:0;position:relative}
+.t h3{font:800 12px 'Nunito Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.c1{background:var(--t1)}.c2{background:var(--t2)}.c3{background:var(--t3)}.c4{background:var(--t4)}.c5{background:var(--t5)}
+.c1 h3,.c2 h3,.c3 h3,.c4 h3,.c5 h3{color:var(--fg);opacity:.75}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font:800 14px 'Bricolage Grotesque',sans-serif;color:var(--ona);flex:none;position:relative}
+.av.round{border-radius:50%}
+.av.s{width:30px;height:30px;font-size:12px;border-radius:10px}
+.b1{background:var(--a1)}.b2{background:var(--a2)}.b3{background:var(--a3)}.b4{background:var(--a4)}
+.pres{position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border-radius:50%;border:3px solid var(--tile);background:var(--a3)}
+.pres.away{background:var(--tile);box-shadow:inset 0 0 0 2px var(--mu)}
+.badge{font:800 12px 'Nunito Sans',sans-serif;background:var(--ac);color:var(--onac);border-radius:999px;min-width:22px;height:22px;line-height:22px;text-align:center;padding:0 6px;box-sizing:border-box}
+.btn{font:700 14px 'Nunito Sans',sans-serif;height:40px;padding:0 16px;border-radius:999px;border:0;background:var(--bg);color:var(--fg);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.pri{background:var(--fg);color:var(--tile)}
+.btn.danger{background:transparent;color:var(--al);box-shadow:inset 0 0 0 2px var(--al)}
+.btn.sm{height:32px;padding:0 12px;font-size:13px}
+.ib{width:44px;height:44px;border-radius:16px;border:0;background:var(--tile);color:var(--fg);display:grid;place-items:center;position:relative}
+.dm{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.dm:last-child{border:0}
+.dm .w{flex:1;min-width:0}
+.dm .w b{display:block}
+.dm .w span{display:block;color:var(--mu);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv{border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:14px;font-weight:800;position:relative}
+.sv small{display:block;font-weight:600;font-size:12px;opacity:.75}
+.sv .badge{position:absolute;top:10px;right:10px}
+.dock{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:6px;background:var(--fg);border-radius:999px;padding:6px}
+.dock span{width:52px;height:48px;border-radius:999px;display:grid;place-items:center;color:var(--bg);position:relative}
+.dock span.on{background:var(--tile);color:var(--fg)}
+.dock .n{position:absolute;top:2px;right:4px;font:800 10px 'Nunito Sans',sans-serif;background:var(--al);color:#fff;border-radius:999px;min-width:16px;height:16px;line-height:16px;text-align:center}
+
+/* chat */
+.chead{display:flex;align-items:center;gap:10px;padding:2px 14px 10px;flex:none}
+.chead .disp{font-size:24px}
+.chead small{display:block;color:var(--mu);font-weight:700;font-size:12px}
+.pills{display:flex;gap:6px;padding:0 14px 10px;overflow:hidden;flex:none}
+.pill{height:34px;padding:0 14px;border-radius:999px;background:var(--tile);display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--mu);white-space:nowrap}
+.pill.on{background:var(--fg);color:var(--tile)}
+.pill .badge{height:20px;line-height:20px;min-width:20px;font-size:11px}
+.msgs{flex:1;min-height:0;overflow:hidden;padding:4px 14px;display:flex;flex-direction:column;gap:8px}
+.day{align-self:center;font-weight:800;font-size:12px;color:var(--mu);background:var(--tile);border-radius:999px;padding:3px 12px}
+.bm{display:flex;gap:8px;align-items:flex-start;max-width:84%}
+.bm>.av{margin-top:22px}
+.bm .body{display:flex;flex-direction:column;gap:4px}
+.bm .who{font-size:12px;font-weight:800;color:var(--mu);margin-left:6px}
+.bub{background:var(--bub);border-radius:20px 20px 20px 6px;padding:9px 14px;font-size:15px}
+.bm.me{align-self:flex-end;flex-direction:row-reverse}
+.bm.me .body{align-items:flex-end}
+.bm.me .bub{background:var(--mine);color:var(--onmine);border-radius:20px 20px 6px 20px}
+.qt{font-size:12px;border-radius:12px;padding:4px 10px;background:var(--tile);color:var(--mu);border-left:4px solid var(--ac)}
+.rx{height:26px;border-radius:999px;background:var(--tile);padding:0 9px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;box-shadow:inset 0 0 0 2px var(--line)}
+.rx.mine{box-shadow:inset 0 0 0 2px var(--ac)}
+.err{font-size:12px;font-weight:700;color:var(--al);display:flex;gap:8px;align-items:center}
+.err u{cursor:pointer}
+.typing{display:flex;align-items:center;gap:8px;padding:0 14px 6px;color:var(--mu);font-size:12px;font-weight:700;flex:none}
+.dots{display:flex;gap:3px;background:var(--tile);border-radius:999px;padding:7px 9px}.dots i{width:5px;height:5px;border-radius:50%;background:var(--mu)}
+.comp{margin:0 10px 26px;display:flex;gap:8px;align-items:center;background:var(--tile);border-radius:999px;padding:6px 6px 6px 18px;flex:none;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.comp span{flex:1;color:var(--mu);font-size:16px}
+.send{width:44px;height:44px;border-radius:50%;border:0;background:var(--ac);color:var(--onac);display:grid;place-items:center}
+
+.seg{display:flex;background:var(--bg);border-radius:999px;padding:4px;gap:4px}
+.seg span{flex:1;text-align:center;font-weight:700;font-size:13px;padding:7px 4px;border-radius:999px;color:var(--mu)}
+.seg span.on{background:var(--tile);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.c2 .seg,.c1 .seg{background:rgba(255,255,255,.5)}
+.sw{width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:var(--tile)}
+.sw.on{background:var(--ac)}.sw.on:after{left:24px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;font-weight:700}
+.opt small{display:block;font-weight:600;color:var(--mu);font-size:12px}
+.chl{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--bg);margin-bottom:6px;font-weight:700}
+.chl b{flex:1}
+.chl .ib{width:32px;height:32px;border-radius:10px}
+
+/* --- palette WireChat (src/styles/theme.css) + finition --- */
+body{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.board h1{color:var(--fg)}
+.board h1:after{content:"";display:block;width:64px;height:5px;margin-top:12px;background:linear-gradient(90deg,var(--ac),var(--acm));border-radius:3px;box-shadow:0 0 16px var(--glow)}
+.b2,.b4{color:#fff5e8}
+.sw.on{background:linear-gradient(180deg,var(--ac),var(--acm))}
+
+.app,.ph{background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");box-shadow:0 24px 70px rgba(0,0,0,.3),inset 0 0 0 1px var(--line)}
+.t{box-shadow:inset 0 0 0 1px var(--line),0 4px 16px rgba(0,0,0,.16)}
+.app>.dock{background:linear-gradient(180deg,var(--tile),var(--bg));box-shadow:inset 0 0 0 1px var(--line)}
+.dk{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.dk.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd),0 0 18px var(--glow)}
+.dk.logo{box-shadow:0 0 0 1px var(--acd),0 0 18px var(--glow)}
+.dk.add{box-shadow:none}
+.dk .n,.dock .n{background:var(--ald);color:#fff5e8;border-color:var(--tile)}
+.btn{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.pri,.btn.acc,.send{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd);box-shadow:inset 0 -2px 0 var(--acd)}
+.btn.danger{color:var(--al);box-shadow:inset 0 0 0 2px var(--ald);background:transparent}
+.c3{background:radial-gradient(500px 260px at 100% 0%,#f6d69c,transparent 60%),linear-gradient(160deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -3px 0 var(--acd),0 12px 40px var(--glow)}
+.c3 h3,.c3 .disp,.c3 b,.c3 p,.c3 div{color:var(--onac)}
+.c3 h3{opacity:.7}
+.c3 .av{color:var(--onac)}
+.c1{background:linear-gradient(160deg,var(--t1),var(--tile) 85%)}
+.c2{background:linear-gradient(160deg,var(--t2),var(--tile) 85%)}
+.c4{background:linear-gradient(160deg,var(--t4),var(--tile) 85%)}
+.c5{background:linear-gradient(160deg,var(--t5),var(--tile) 85%)}
+.t h3,.c1 h3,.c2 h3,.c4 h3,.c5 h3{color:var(--act);opacity:1}
+.t h3 .ct{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.badge{background:var(--ac);color:var(--onac)}
+.av{box-shadow:inset 0 0 0 1px rgba(255,245,232,.14)}
+.pres{background:var(--ok);border-color:var(--tile)}
+.pill{box-shadow:inset 0 0 0 1px var(--line)}
+.pill.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd)}
+.chead .disp span{color:var(--act)}
+.day{color:var(--act);box-shadow:inset 0 0 0 1px var(--line)}
+.bub{box-shadow:inset 0 0 0 1px var(--line)}
+.bm.me .bub{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onmine);box-shadow:inset 0 -2px 0 var(--acd),0 6px 20px var(--glow)}
+.qt{border-left-color:var(--ac);background:var(--tile)}
+.rx{background:var(--tile)}
+.rx.mine{box-shadow:inset 0 0 0 2px var(--ac);background:var(--glow)}
+.dots i{background:var(--ac)}
+.comp{box-shadow:inset 0 0 0 1px var(--line)}
+.comp .in{box-shadow:0 0 0 3px var(--glow),inset 0 0 0 1px var(--acd)}
+.ph .comp{background:var(--tile);box-shadow:0 0 0 3px var(--glow),inset 0 0 0 1px var(--acd),0 8px 24px rgba(0,0,0,.25)}
+.seg{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.seg span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd)}
+.c2 .seg,.c1 .seg{background:var(--bg)}
+.thm .on{outline-color:var(--ac)}
+.fld{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.sv{box-shadow:inset 0 0 0 1px var(--line)}
+.mc,.chl,.ib{box-shadow:inset 0 0 0 1px var(--line)}
+.dm{border-color:var(--line)}
+.ph .dock{background:#201b17;box-shadow:0 10px 30px rgba(0,0,0,.4),inset 0 0 0 1px #3a3226}
+.ph .dock span{color:#d8c69e}
+.ph .dock span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac)}
+.toggle{background:var(--tile);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1>Bento · mobile</h1><p>Les mêmes tuiles empilées sur deux colonnes, avec un dock flottant en bas de l'écran. La zone de saisie flotte aussi, et les canaux défilent en pastilles sous le titre.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='light'?'dark':'light'">Changer de thème</button>
+</header>
+<div class="phones">
+
+<!-- 01 -->
+<div><div class="cap"><b>01</b> · ACCUEIL</div>
+<div class="ph">
+  <div class="status"><span>9:41</span><span>●●● 100 %</span></div>
+  <div class="scroll">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 2px"><h2 class="disp" style="font-size:34px">Salut Zack 👋</h2><div class="av b2 round">ZA</div></div>
+    <div class="two">
+      <div class="t c3"><b class="disp" style="font-size:44px">15</b><div style="font-weight:700;font-size:13px">messages non lus</div></div>
+      <div class="t c4"><h3 style="margin-bottom:6px">Demande <span>1</span></h3><div style="display:flex;gap:8px;align-items:center;font-weight:800"><div class="av s b3">TO</div>Tom</div><div style="display:flex;gap:6px;margin-top:8px"><button class="btn pri sm">Accepter</button><button class="btn sm" style="background:var(--tile);padding:0 10px" aria-label="Refuser">✕</button></div></div>
+    </div>
+    <div class="t">
+      <h3>Conversations privées <span class="badge">4</span></h3>
+      <div class="dm"><div class="av b1">AN<span class="pres"></span></div><div class="w"><b>Ana</b><span>On valide la maquette demain ?</span></div><span class="badge">2</span></div>
+      <div class="dm"><div class="av b3">ML</div><div class="w"><b>Marc, Léa</b><span>Léa : je vérifie le contraste</span></div><span class="badge">2</span></div>
+      <div class="dm"><div class="av b4">LÉ<span class="pres away"></span></div><div class="w"><b>Léa</b><span>Vous : Merci pour le lien !</span></div></div>
+    </div>
+    <div class="two">
+      <div class="sv c1"><div class="av b2">ÉP</div><div>Équipe projet<small>4 canaux</small></div></div>
+      <div class="sv c2"><span class="badge">3</span><div class="av b3">ÉT</div><div>Études<small>6 canaux</small></div></div>
+      <div class="sv c3"><div class="av b1">MU</div><div>Musique<small>3 canaux</small></div></div>
+      <div class="sv c4"><span class="badge">12</span><div class="av b4">JV</div><div>Jeux vidéo<small>5 canaux</small></div></div>
+    </div>
+  </div>
+  <nav class="dock" aria-label="Navigation"><span class="on"><svg class="i"><use href="#i-home"/></svg></span><span><svg class="i"><use href="#i-chat"/></svg></span><span><svg class="i"><use href="#i-search"/></svg></span><span><svg class="i"><use href="#i-bell"/></svg><em class="n" style="font-style:normal">2</em></span><span><svg class="i"><use href="#i-user"/></svg></span></nav>
+</div></div>
+
+<!-- 02 -->
+<div><div class="cap"><b>02</b> · CONVERSATION</div>
+<div class="ph">
+  <div class="status"><span>9:41</span><span>●●● 100 %</span></div>
+  <div class="chead"><button class="ib" aria-label="Retour"><svg class="i"><use href="#i-back"/></svg></button><div><h2 class="disp">maquettes</h2><small>Équipe projet · 4 en ligne</small></div><button class="ib" style="margin-left:auto" aria-label="Paramètres du serveur"><svg class="i"><use href="#i-gear"/></svg></button></div>
+  <div class="pills"><span class="pill"># général <span class="badge">4</span></span><span class="pill on"># maquettes</span><span class="pill"># annonces</span><span class="pill"># hors-sujet</span></div>
+  <div class="msgs">
+    <span class="day">Aujourd'hui</span>
+    <div class="bm"><div class="av s b1">AN</div><div class="body"><span class="who">Ana · 14:02</span><div class="bub">On valide la maquette demain ? J'ai préparé les captures.</div><div style="display:flex;gap:4px"><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div></div></div>
+    <div class="bm"><div class="av s b1">MA</div><div class="body"><span class="who">Marc · 14:05</span><div class="bub">Oui, je prépare le résumé des retours.</div></div></div>
+    <div class="bm me"><div class="body"><div class="qt">↩ Ana : On valide la maquette…</div><div class="bub">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div></div>
+    <div class="bm me"><div class="body"><div class="bub" style="opacity:.55">Je les envoie à Léa aussi.</div><span class="err">Le message n'a pas pu être envoyé · <u>Réessayer</u></span></div></div>
+  </div>
+  <div class="typing"><span class="dots"><i></i><i></i><i></i></span>Léa est en train d'écrire…</div>
+  <div class="comp"><span>Écrire un message</span><button class="send" aria-label="Envoyer"><svg class="i"><use href="#i-send"/></svg></button></div>
+</div></div>
+
+<!-- 03 -->
+<div><div class="cap"><b>03</b> · OPTIONS</div>
+<div class="ph">
+  <div class="status"><span>9:41</span><span>●●● 100 %</span></div>
+  <div class="scroll">
+    <h2 class="disp" style="font-size:34px;padding:4px 4px 2px">Options</h2>
+    <div class="t c1" style="display:flex;gap:12px;align-items:center"><div class="av b2" style="width:56px;height:56px;font-size:20px;border-radius:18px">ZA</div><div style="flex:1"><b class="disp" style="font-size:24px">Zack</b><div style="font-size:13px;font-weight:700;opacity:.75">zack@exemple.ca</div></div><button class="ib" aria-label="Modifier le profil"><svg class="i"><use href="#i-pen"/></svg></button></div>
+    <div class="t"><h3>Notifications</h3><div class="seg"><span>Aucune</span><span class="on">Mentions</span><span>Toutes</span></div></div>
+    <div class="t c2"><h3>Thème</h3><div class="seg"><span>Clair</span><span class="on">Sombre</span><span>Système</span></div></div>
+    <div class="t"><h3>Accessibilité</h3>
+      <div class="opt"><div>Langue</div><span class="btn sm">Français ▾</span></div>
+      <div class="opt"><div>Réduire les animations</div><div class="sw on" role="switch" aria-checked="true"></div></div></div>
+    <div class="two"><button class="btn" style="background:var(--tile);height:48px;justify-content:center">Se déconnecter</button><button class="btn danger" style="height:48px;justify-content:center">Supprimer</button></div>
+  </div>
+  <nav class="dock" aria-label="Navigation"><span><svg class="i"><use href="#i-home"/></svg></span><span><svg class="i"><use href="#i-chat"/></svg></span><span><svg class="i"><use href="#i-search"/></svg></span><span><svg class="i"><use href="#i-bell"/></svg><em class="n" style="font-style:normal">2</em></span><span class="on"><svg class="i"><use href="#i-user"/></svg></span></nav>
+</div></div>
+
+<!-- 04 -->
+<div><div class="cap"><b>04</b> · SERVEUR</div>
+<div class="ph">
+  <div class="status"><span>9:41</span><span>●●● 100 %</span></div>
+  <div class="scroll" style="padding-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px"><button class="ib" aria-label="Retour"><svg class="i"><use href="#i-back"/></svg></button><h2 class="disp" style="font-size:26px">Équipe projet</h2></div>
+    <div class="t c1"><h3>Aperçu</h3><div style="display:flex;gap:8px;align-items:center;background:var(--tile);border-radius:999px;padding:4px 4px 4px 16px;font-weight:700"><span style="flex:1">Équipe projet</span><button class="btn pri sm">Enregistrer</button></div></div>
+    <div class="t"><h3>Membres <span class="badge">12</span></h3>
+      <div class="dm"><div class="av s b2">ZA</div><div class="w"><b>Zack</b><span>Propriétaire du serveur</span></div></div>
+      <div class="dm"><div class="av s b1">AN</div><div class="w"><b>Ana</b></div><button class="btn danger sm">Retirer</button></div>
+      <div class="dm"><div class="av s b1">MA</div><div class="w"><b>Marc</b></div><button class="btn danger sm">Retirer</button></div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:6px"><svg class="i" style="width:18px"><use href="#i-plus"/></svg>Ajouter des membres</button></div>
+    <div class="t"><h3>Canaux <span class="badge">4</span></h3>
+      <div class="chl"><span style="color:var(--mu)">#</span><b>général</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl"><span style="color:var(--mu)">#</span><b>maquettes</b><button class="ib" aria-label="Renommer"><svg class="i" style="width:15px"><use href="#i-pen"/></svg></button><button class="ib" aria-label="Supprimer"><svg class="i" style="width:15px"><use href="#i-trash"/></svg></button></div>
+      <div class="chl" style="background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--mu)"><svg class="i" style="width:18px"><use href="#i-plus"/></svg>Nouveau canal</div></div>
+    <div class="t c4" style="display:flex;justify-content:space-between;align-items:center;gap:10px"><b>Zone sensible</b><button class="btn danger sm">Supprimer le serveur</button></div>
+  </div>
+</div></div>
+
+</div>
+</main>
+</body>
+</html>

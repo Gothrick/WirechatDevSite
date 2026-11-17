@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zinzin web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@500;700;800;900&family=Caveat:wght@600;700&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=light]{--page:#e6dccb;--cork:#c9995a;--corkd:#b5844a;--note:#fff5c2;--paper:#faf6f0;--fg:#201b17;--mu:#5c4a33;--ink:#201b17;--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--al:#a22a2a;--ald:#c4573f;--ok:#23a55a;--pink:#f7b6c2;--mint:#bfe6c9;--sky:#bfe0ef;--lav:#d9cdf2;--tape:rgba(255,248,225,.72);--shadow:rgba(60,35,10,.35)}
+[data-theme=dark]{--page:#0a0806;--cork:#3a2c1c;--corkd:#2b2014;--note:#3a3118;--paper:#201b17;--fg:#f0ddb0;--mu:#c9b48c;--ink:#0a0806;--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--al:#ffb1a1;--ald:#c4573f;--ok:#23a55a;--pink:#5a2f38;--mint:#23402c;--sky:#1f3a46;--lav:#352c4a;--tape:rgba(240,221,176,.22);--shadow:rgba(0,0,0,.6)}
+body{background:var(--page);color:var(--fg);font-family:'Nunito',system-ui,sans-serif;padding:32px 24px 64px}
+.board{max-width:1280px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px}
+.board h1{font:400 76px 'Bagel Fat One',sans-serif;line-height:.9;margin:0;color:var(--ac);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:6px 6px 0 var(--ink);transform:rotate(-2deg);display:inline-block}
+.board h1 small{font:700 30px 'Caveat',cursive;-webkit-text-stroke:0;color:var(--fg);text-shadow:none;margin-left:10px}
+.board header p{margin:14px 0 0;color:var(--mu);max-width:64ch;font-weight:600}
+.toggle{font:400 18px 'Bagel Fat One',sans-serif;background:var(--ac);color:var(--onac);border:3px solid var(--ink);border-radius:14px;padding:10px 16px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transform:rotate(2deg)}
+.toggle:active{transform:translate(3px,3px) rotate(2deg);box-shadow:1px 1px 0 var(--ink)}
+.cap{font:700 26px 'Caveat',cursive;color:var(--mu);margin:44px 0 8px}
+.cap b{font-family:'Bagel Fat One',sans-serif;font-weight:400;font-size:20px;color:var(--fg);background:var(--ac);border:2px solid var(--ink);border-radius:8px;padding:0 8px;margin-right:6px}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hand{font-family:'Caveat',cursive;font-weight:700}
+.av.abs{position:absolute}
+
+/* le tableau de liège */
+.app{position:relative;width:1280px;height:800px;overflow:hidden;border-radius:26px;border:10px solid #6b4a26;box-sizing:border-box;font-size:15px;line-height:1.4;
+  background:radial-gradient(circle at 20% 30%,rgba(0,0,0,.10) 0 2px,transparent 3px) 0 0/23px 19px,radial-gradient(circle at 70% 60%,rgba(255,255,255,.10) 0 1.5px,transparent 2.5px) 0 0/17px 21px,linear-gradient(135deg,var(--cork),var(--corkd));
+  box-shadow:inset 0 0 40px rgba(0,0,0,.35),0 24px 60px var(--shadow)}
+.abs{position:absolute}
+.tape{position:absolute;width:90px;height:26px;background:var(--tape);box-shadow:0 1px 2px rgba(0,0,0,.15);z-index:3}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff9a8a,#c4573f 60%,#7a2a1a);box-shadow:2px 3px 3px rgba(0,0,0,.4);z-index:3}
+.pin.y{background:radial-gradient(circle at 35% 35%,#fff0b0,#eab766 60%,#8a5a10)}
+.pin.g{background:radial-gradient(circle at 35% 35%,#c6f2cf,#23a55a 60%,#0e4a24)}
+.card{position:absolute;background:var(--paper);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);color:var(--fg);box-sizing:border-box}
+.note{background:var(--note)}
+.pinkc{background:var(--pink)}.mintc{background:var(--mint)}.skyc{background:var(--sky)}.lavc{background:var(--lav)}
+.ttl{font:400 26px 'Bagel Fat One',sans-serif;line-height:1;margin:0;display:flex;align-items:center;gap:8px}
+.scribble{font:700 22px 'Caveat',cursive;color:var(--mu)}
+
+/* aimants de frigo = serveurs */
+.mag{position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;font:400 22px 'Bagel Fat One',sans-serif;color:var(--ink);box-shadow:4px 5px 0 var(--ink);z-index:4;cursor:pointer}
+.mag.on{outline:4px dashed var(--ac);outline-offset:5px;animation:boing 1.6s ease-in-out infinite}
+.mag .n{position:absolute;top:-8px;right:-10px;background:var(--ald);color:#fff5e8;font:400 13px 'Bagel Fat One',sans-serif;border:2px solid var(--ink);border-radius:999px;min-width:24px;height:24px;line-height:20px;text-align:center;padding:0 4px;box-sizing:border-box;animation:wiggle 1.2s ease-in-out infinite}
+.m1{background:var(--ac)}.m2{background:#f7b6c2}.m3{background:#bfe6c9}.m4{background:#bfe0ef}.m5{background:#d9cdf2}
+@keyframes boing{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes wiggle{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* avatars avec yeux qui roulent */
+.av{position:relative;width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);flex:none;display:grid;place-items:end center;font:400 12px 'Bagel Fat One',sans-serif;color:var(--ink);padding-bottom:3px;box-sizing:border-box}
+.av:before,.av:after{content:"";position:absolute;top:9px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at var(--px,55%) var(--py,60%),#111 0 3px,#fff 3.5px);border:2px solid var(--ink);box-sizing:border-box}
+.av:before{left:8px}.av:after{right:8px}
+.av.s{width:34px;height:34px;font-size:0;padding:0}
+.av.s:before,.av.s:after{top:7px;width:11px;height:11px}.av.s:before{left:5px}.av.s:after{right:5px}
+.av.l{width:64px;height:64px;font-size:15px}
+.av.l:before,.av.l:after{top:12px;width:18px;height:18px}.av.l:before{left:11px}.av.l:after{right:11px}
+.v1{background:#d49a42}.v2{background:#e98a6a}.v3{background:#8fd18e}.v4{background:#9cc3e6}.v5{background:#c8a6f0}
+.av .on{position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;border-radius:50%;background:var(--ok);border:3px solid var(--ink);box-sizing:border-box}
+.av .away{position:absolute;right:-4px;bottom:-4px;font:400 11px 'Bagel Fat One',sans-serif;color:var(--fg)}
+.app:hover .av:before,.app:hover .av:after{--px:70%;--py:45%}
+
+.btn{font:400 15px 'Bagel Fat One',sans-serif;height:38px;padding:0 14px;border:3px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--fg);box-shadow:3px 3px 0 var(--ink);display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn.pri{background:var(--ac);color:var(--onac)}
+.btn.no{background:var(--paper);color:var(--al)}
+.btn.danger{background:var(--ald);color:#fff5e8}
+.btn.sm{height:30px;font-size:13px;padding:0 10px;border-width:2px}
+.badge{font:400 13px 'Bagel Fat One',sans-serif;background:var(--ald);color:#fff5e8;border:2px solid var(--ink);border-radius:999px;padding:0 7px;line-height:20px;display:inline-block}
+.badge.y{background:var(--ac);color:var(--onac)}
+.row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:2px dashed color-mix(in srgb,var(--ink) 25%,transparent)}
+.row:last-child{border:0}
+.row .w{flex:1;min-width:0}
+.row .w b{font-weight:900;font-size:16px}
+.row .w small{display:block;color:var(--mu);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stk{position:absolute;font:400 16px 'Bagel Fat One',sans-serif;padding:6px 12px;border:3px solid var(--ink);border-radius:999px;box-shadow:3px 3px 0 var(--ink);z-index:5;white-space:nowrap}
+.arrow{position:absolute;z-index:5;color:var(--fg)}
+.arrow svg{stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round}
+
+/* bulles de BD */
+.bub{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:10px 14px;font-weight:700;font-size:16px;box-shadow:4px 4px 0 var(--ink);max-width:470px}
+.bub:after{content:"";position:absolute;left:-14px;bottom:10px;width:18px;height:18px;background:inherit;border-left:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:skewY(30deg) rotate(10deg);border-radius:0 0 0 6px}
+.me .bub{background:var(--ac);color:var(--onac)}
+.me .bub:after{left:auto;right:-14px;border-left:0;border-right:3px solid var(--ink);transform:skewY(-30deg) rotate(-10deg);border-radius:0 0 6px 0}
+.msg{display:flex;gap:12px;align-items:flex-end}
+.msg.me{flex-direction:row-reverse}
+.who{font:700 20px 'Caveat',cursive;color:var(--mu);margin:0 0 2px 8px}
+.who time{font:800 12px 'Nunito',sans-serif;margin-left:6px}
+.me .who{text-align:right;margin:0 8px 2px 0}
+.rx{display:inline-flex;gap:4px;align-items:center;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:1px 9px;font:800 13px 'Nunito',sans-serif;margin:8px 4px 0 0;box-shadow:2px 2px 0 var(--ink)}
+.rx.mine{background:var(--ac);color:var(--onac)}
+.quote{font:700 18px 'Caveat',cursive;color:var(--mu);border-left:4px solid var(--ac);padding-left:8px;margin-bottom:4px}
+.boom{position:absolute;font:400 22px 'Bagel Fat One',sans-serif;color:var(--onac);background:var(--ac);border:3px solid var(--ink);padding:14px 18px;clip-path:polygon(50% 0,61% 22%,85% 8%,78% 34%,100% 42%,80% 58%,94% 82%,66% 74%,58% 100%,45% 78%,22% 94%,26% 68%,0 60%,20% 44%,4% 20%,32% 28%);z-index:6}
+.typing{display:flex;align-items:center;gap:8px;font:700 22px 'Caveat',cursive;color:var(--fg)}
+.typing i{width:10px;height:10px;border-radius:50%;background:var(--ac);border:2px solid var(--ink);animation:bob .9s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.comp{display:flex;gap:10px;align-items:center}
+.field{flex:1;height:50px;border:3px solid var(--ink);border-radius:16px;background:var(--paper);display:flex;align-items:center;padding:0 16px;font-weight:800;color:var(--mu);box-shadow:inset 3px 3px 0 rgba(0,0,0,.08)}
+.send{width:62px;height:56px;border:3px solid var(--ink);border-radius:50%;background:var(--ac);color:var(--onac);display:grid;place-items:center;box-shadow:4px 4px 0 var(--ink);font:400 13px 'Bagel Fat One',sans-serif}
+
+/* options : jouets */
+.knob{width:84px;height:84px;border-radius:50%;border:3px solid var(--ink);background:conic-gradient(var(--ac) 0 var(--k,40%),var(--paper) 0);position:relative;box-shadow:4px 4px 0 var(--ink)}
+.knob:after{content:"";position:absolute;inset:16px;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
+.knob i{position:absolute;left:50%;top:6px;width:6px;height:22px;background:var(--ink);border-radius:3px;transform-origin:50% 36px;transform:translateX(-50%) rotate(var(--r,0deg));z-index:1}
+.lever{width:64px;height:36px;border-radius:999px;border:3px solid var(--ink);background:var(--paper);position:relative;box-shadow:3px 3px 0 var(--ink)}
+.lever:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--mu);border:2px solid var(--ink)}
+.lever.on{background:var(--ok)}
+.lever.on:after{left:31px;background:var(--paper)}
+.big3{display:flex;gap:10px}
+.big3 span{flex:1;text-align:center;font:400 15px 'Bagel Fat One',sans-serif;border:3px solid var(--ink);border-radius:14px;padding:10px 4px;background:var(--paper);box-shadow:3px 3px 0 var(--ink)}
+.big3 span.on{background:var(--ac);color:var(--onac);transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.lbl{font:400 15px 'Bagel Fat One',sans-serif;margin:0 0 8px}
+.inp{height:40px;border:3px solid var(--ink);border-radius:12px;background:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-weight:800}
+
+/* carte à collectionner */
+.tc{width:150px;height:200px;position:absolute;border:3px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:8px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;background:var(--paper)}
+.tc .hp{align-self:stretch;display:flex;justify-content:space-between;font:400 12px 'Bagel Fat One',sans-serif}
+.tc .pic{width:100%;height:78px;border:2px solid var(--ink);border-radius:8px;display:grid;place-items:center}
+.tc b{font:400 17px 'Bagel Fat One',sans-serif}
+.tc small{font-weight:800;color:var(--mu);font-size:12px}
+.holo{background:linear-gradient(115deg,#ffe8a8,#f7b6c2,#bfe0ef,#bfe6c9,#ffe8a8)}
+
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1>Zinzin <small>(c'est le bordel organisé)</small></h1>
+  <p>Ton WireChat devient un tableau de liège. Les serveurs sont des aimants de frigo, les panneaux sont des post-it collés de travers et les messages sont des bulles de BD. Les avatars ont des yeux qui suivent la souris, et les options sont des jouets. Ça reste quand même la palette WireChat.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='light'?'dark':'light'">Éteindre la lumière 🌙</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>01</b>l'accueil, aka le frigo</div>
+<div class="app">
+  <img src="logo.png" alt="WireChat" class="abs" style="left:28px;top:20px;width:74px;height:74px;object-fit:contain;background:#14100A;border:3px solid var(--ink);border-radius:18px;padding:6px;box-sizing:border-box;box-shadow:4px 4px 0 var(--ink);transform:rotate(-8deg)">
+  <div class="mag m1 on" style="left:36px;top:130px" title="Accueil">🏠</div>
+  <div class="mag m2" style="left:28px;top:220px">ÉP</div>
+  <div class="mag m3" style="left:40px;top:306px">ÉT<span class="n">3</span></div>
+  <div class="mag m4" style="left:26px;top:392px">MU</div>
+  <div class="mag m5" style="left:42px;top:478px">JV<span class="n">12</span></div>
+  <div class="mag" style="left:32px;top:568px;background:var(--paper);border-style:dashed;box-shadow:none" title="Nouveau serveur">+</div>
+  <div class="stk" style="left:14px;top:650px;background:var(--paper);transform:rotate(-6deg);font:700 20px 'Caveat',cursive">↑ serveurs!</div>
+
+  <div class="card note" style="left:150px;top:28px;width:520px;height:230px;padding:22px 26px;transform:rotate(-1.5deg)">
+    <span class="tape" style="left:200px;top:-14px;transform:rotate(3deg)"></span>
+    <div class="scribble">lundi 17 nov. ☀️</div>
+    <h2 class="ttl" style="font-size:54px;margin:4px 0 10px">SALUT ZACK!!</h2>
+    <div style="font-weight:800;font-size:17px">t'as <span class="badge y">15</span> messages pas lus, <span class="badge">2</span> notifs, et Tom veut être ton ami <span style="font-size:22px">🥺</span></div>
+    <div style="display:flex;gap:10px;margin-top:16px"><span class="btn pri">📬 Tout lire</span><span class="btn">🔍 Chercher</span><span class="btn">🔔 Notifs</span></div>
+  </div>
+
+  <div class="card pinkc" style="left:700px;top:40px;width:270px;height:220px;padding:18px;transform:rotate(3deg)">
+    <span class="pin" style="left:122px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:22px">Demande d'ami!</h3>
+    <div style="display:flex;gap:12px;align-items:center;margin:14px 0"><div class="av l v3">TO</div><div><b style="font:400 22px 'Bagel Fat One'">Tom</b><div class="hand" style="font-size:20px">veut devenir ton pote</div></div></div>
+    <div style="display:flex;gap:8px"><span class="btn pri">Ouiii ✨</span><span class="btn no">Nope</span></div>
+  </div>
+
+  <div class="card skyc" style="left:1000px;top:24px;width:244px;height:300px;padding:16px;transform:rotate(-3deg)">
+    <span class="pin y" style="left:110px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:22px">Ding ding 🔔</h3>
+    <div class="row"><div class="av s v4"></div><div class="w"><b>Léa</b><small>t'a mentionné #maquettes</small></div></div>
+    <div class="row"><div class="av s v1"></div><div class="w"><b>Marc</b><small>t'a ajouté à Études</small></div></div>
+    <div class="row"><div class="av s v5"></div><div class="w"><b>+12 messages</b><small>#soirée-jeudi</small></div></div>
+    <div class="hand" style="font-size:20px;margin-top:6px">tout marquer comme lu → ✔️</div>
+  </div>
+
+  <div class="card" style="left:150px;top:300px;width:480px;height:440px;padding:18px 22px;transform:rotate(1deg)">
+    <span class="tape" style="left:-20px;top:20px;transform:rotate(-40deg)"></span>
+    <span class="tape" style="right:-20px;top:20px;transform:rotate(40deg)"></span>
+    <h3 class="ttl">Les potes 👯 <span class="badge y" style="margin-left:auto">3 en ligne</span></h3>
+    <div style="display:flex;gap:8px;margin:12px 0 6px"><span class="btn sm pri">Tous</span><span class="btn sm">En ligne</span><span class="btn sm">En attente</span><span class="btn sm" style="margin-left:auto"><svg class="i" style="width:16px"><use href="#i-plus"/></svg>Ajouter</span></div>
+    <div class="row"><div class="av v1">AN<span class="on"></span></div><div class="w"><b>Ana</b><small>En ligne · probablement en train de faire des maquettes</small></div><span class="btn sm">Écrire ✏️</span></div>
+    <div class="row"><div class="av v2">MA<span class="on"></span></div><div class="w"><b>Marc</b><small>En ligne</small></div><span class="btn sm">Écrire ✏️</span></div>
+    <div class="row"><div class="av v4">LÉ<span class="away">zZ</span></div><div class="w"><b>Léa</b><small>Inactive (elle fait une sieste)</small></div><span class="btn sm">Écrire ✏️</span></div>
+    <div class="row" style="opacity:.65"><div class="av v5">SO</div><div class="w"><b>Sofia</b><small>Hors ligne</small></div></div>
+    <div class="row" style="opacity:.65"><div class="av v3">NI</div><div class="w"><b>Nina</b><small>Demande envoyée… on attend 👀</small></div></div>
+  </div>
+
+  <div class="card mintc" style="left:670px;top:300px;width:330px;height:440px;padding:18px;transform:rotate(-2deg)">
+    <span class="pin g" style="left:150px;top:-9px"></span>
+    <h3 class="ttl">Messages privés 💌</h3>
+    <div class="row" style="margin-top:8px"><div class="av v1">AN<span class="on"></span></div><div class="w"><b>Ana</b><small>On valide la maquette demain ?</small></div><span class="badge">2</span></div>
+    <div class="row"><div class="av v3">ML</div><div class="w"><b>Marc, Léa</b><small>Léa : je vérifie le contraste</small></div><span class="badge">2</span></div>
+    <div class="row"><div class="av v4">LÉ</div><div class="w"><b>Léa</b><small>Vous : Merci pour le lien !</small></div></div>
+    <div class="row"><div class="av v5">SO</div><div class="w"><b>Sofia</b><small>On se reparle après l'examen</small></div></div>
+    <span class="btn pri" style="margin-top:10px"><svg class="i"><use href="#i-pen"/></svg>Nouveau message</span>
+  </div>
+  <div class="stk" style="left:1030px;top:380px;background:var(--ac);transform:rotate(8deg)">tu gères ⭐</div>
+  <div class="stk" style="left:1060px;top:470px;background:var(--lav);transform:rotate(-10deg)">v1.3.1 🚀</div>
+  <div class="stk" style="left:1020px;top:560px;background:var(--pink);transform:rotate(4deg)">bois de l'eau 💧</div>
+  <div class="av l v2 abs" style="left:1130px;top:660px;transform:rotate(8deg)">ZA<span class="on"></span></div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>02</b>la conversation, version mur d'enquête 🕵️ (le fil rouge suit l'ordre des messages)</div>
+<div class="app">
+  <img src="logo.png" alt="WireChat" class="abs" style="left:28px;top:20px;width:74px;height:74px;object-fit:contain;background:#14100A;border:3px solid var(--ink);border-radius:18px;padding:6px;box-sizing:border-box;box-shadow:4px 4px 0 var(--ink);transform:rotate(-8deg)">
+  <div class="mag m1" style="left:1170px;top:24px">🏠</div>
+  <div class="mag m2 on" style="left:1100px;top:70px">ÉP</div>
+  <div class="mag m3" style="left:1176px;top:118px">ÉT<span class="n">3</span></div>
+  <div class="mag m4" style="left:1104px;top:166px">MU</div>
+  <div class="mag m5" style="left:1180px;top:214px">JV<span class="n">12</span></div>
+
+  <!-- roue des canaux -->
+  <div class="abs" style="left:40px;top:120px;width:250px;height:250px">
+    <div class="abs" style="inset:0;border-radius:50%;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:conic-gradient(var(--pink) 0 25%,var(--ac) 0 50%,var(--mint) 0 75%,var(--sky) 0);animation:spin 18s linear infinite"></div>
+    <div class="abs" style="left:100px;top:100px;width:50px;height:50px;border-radius:50%;background:var(--paper);border:4px solid var(--ink);display:grid;place-items:center;font:400 13px 'Bagel Fat One'">ÉP</div>
+    <span class="abs" style="left:136px;top:44px;font:400 16px 'Bagel Fat One';color:#201b17"># général <span class="badge">4</span></span>
+    <span class="abs" style="left:122px;top:176px;font:400 15px 'Bagel Fat One';color:#201b17"># maquettes</span>
+    <span class="abs" style="left:14px;top:170px;font:400 16px 'Bagel Fat One';color:#201b17"># annonces</span>
+    <span class="abs" style="left:14px;top:56px;font:400 16px 'Bagel Fat One';color:#201b17"># hors-sujet</span>
+    <div class="abs" style="left:250px;top:168px;width:0;height:0;border:16px solid transparent;border-right:28px solid var(--ald);filter:drop-shadow(3px 3px 0 var(--ink))"></div>
+  </div>
+  <div class="stk" style="left:60px;top:392px;background:var(--paper);transform:rotate(-5deg);font:700 21px 'Caveat',cursive">↑ la roue des canaux (fais-la tourner)</div>
+  <span class="btn sm abs" style="left:90px;top:440px;transform:rotate(3deg)"><svg class="i" style="width:15px"><use href="#i-plus"/></svg>Canal</span>
+
+  <!-- tas de membres -->
+  <div class="card lavc" style="left:40px;top:500px;width:250px;height:250px;padding:14px;transform:rotate(-3deg)">
+    <span class="pin" style="left:116px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:19px">Le tas de monde</h3>
+    <div class="av v2 abs" style="left:30px;top:70px;transform:rotate(-14deg)">ZA<span class="on"></span></div>
+    <div class="av v1 abs" style="left:80px;top:56px;transform:rotate(10deg)">AN<span class="on"></span></div>
+    <div class="av v2 abs" style="left:128px;top:76px;transform:rotate(-6deg)">MA<span class="on"></span></div>
+    <div class="av v4 abs" style="left:176px;top:60px;transform:rotate(18deg)">LÉ<span class="away">zZ</span></div>
+    <div class="av v5 abs" style="left:56px;top:120px;opacity:.5;transform:rotate(22deg)">SO</div>
+    <div class="av v3 abs" style="left:110px;top:126px;opacity:.5;transform:rotate(-20deg)">TO</div>
+    <div class="av v1 abs" style="left:160px;top:118px;opacity:.5;transform:rotate(8deg)">+6</div>
+    <div class="hand abs" style="left:16px;top:186px;font-size:20px">4 en ligne sur 12 · <u>la liste</u></div>
+  </div>
+
+  <h2 class="abs ttl" style="left:350px;top:22px;font-size:46px;color:var(--ac);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:4px 4px 0 var(--ink);transform:rotate(-2deg)"># maquettes</h2>
+  <div class="stk" style="left:700px;top:30px;background:var(--note);transform:rotate(4deg)">AUJOURD'HUI 📅</div>
+
+  <!-- le fil rouge -->
+  <svg class="abs" style="left:0;top:0;z-index:2;pointer-events:none" width="1260" height="780" aria-hidden="true"><path d="M380 112 L 860 214 L 430 338 L 870 438 L 410 524" fill="none" stroke="#c4573f" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 0" style="filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35))"/></svg>
+  <span class="pin abs" style="left:371px;top:103px"></span>
+  <span class="pin abs" style="left:851px;top:205px"></span>
+  <span class="pin y abs" style="left:421px;top:329px"></span>
+  <span class="pin abs" style="left:861px;top:429px"></span>
+  <span class="pin y abs" style="left:401px;top:515px"></span>
+
+  <div class="msg abs" style="left:390px;top:112px;transform:rotate(-2deg);z-index:4"><div class="av v1">AN</div><div><div class="who">Ana<time>14:02</time></div><div class="bub" style="max-width:380px">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div></div>
+  <div class="msg abs" style="left:700px;top:224px;transform:rotate(3deg);z-index:4"><div class="av v2">MA</div><div><div class="who">Marc<time>14:05</time></div><div class="bub">Oui, je prépare le résumé des retours.</div></div></div>
+  <div class="msg me abs" style="left:440px;top:300px;transform:rotate(2deg);z-index:4"><div class="av v2">ZA</div><div><div class="who">toi<time>14:08 · modifié</time></div><div class="quote">↩ Ana : On valide la maquette demain ?</div><div class="bub" style="max-width:380px">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div></div>
+  <div class="msg abs" style="left:690px;top:448px;transform:rotate(-3deg);z-index:4"><div class="av v4">LÉ</div><div><div class="who">Léa<time>14:11</time></div><div class="bub" style="max-width:330px"><span style="background:var(--ac);border:2px solid var(--ink);border-radius:8px;padding:0 5px">@Zack</span> je vérifie le contraste du thème clair ce soir.</div></div></div>
+  <div class="msg me abs" style="left:370px;top:520px;transform:rotate(-1.5deg);z-index:4"><div class="av v2">ZA</div><div><div class="bub" style="opacity:.6">Je les envoie à Léa aussi.</div><div style="text-align:right;margin-top:6px"><span class="hand" style="font-size:20px;color:var(--al)">oups, pas envoyé 😬</span> <span class="btn sm">Réessayer</span></div></div></div>
+  <div class="boom" style="left:960px;top:96px;transform:rotate(14deg);z-index:5">+1!</div>
+  <div class="stk" style="left:1000px;top:560px;background:var(--paper);transform:rotate(6deg)"><span class="typing" style="font-size:19px"><i></i><i></i><i></i>Ana écrit…</span></div>
+
+  <!-- composer : un ticket de caisse géant -->
+  <div class="card note" style="left:340px;top:630px;width:880px;height:130px;padding:14px 18px;transform:rotate(-1deg);z-index:6">
+    <span class="tape" style="left:-24px;top:40px;transform:rotate(-80deg)"></span>
+    <div class="hand" style="font-size:20px;display:flex;align-items:center;gap:6px;margin-bottom:6px"><svg class="i"><use href="#i-reply"/></svg>tu réponds à <b>Léa</b> (sur le fil rouge) <span class="btn sm" style="margin-left:auto">✕ annuler</span></div>
+    <div class="comp"><div class="field">Écris un truc cool dans #maquettes…</div><span class="btn" style="height:50px">😜</span><button class="send" aria-label="Envoyer">GO!</button></div>
+  </div>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>03</b>les options, version système solaire ☀️ (tout tourne autour de toi)</div>
+<div class="app">
+  <img src="logo.png" alt="WireChat" class="abs" style="left:28px;top:20px;width:74px;height:74px;object-fit:contain;background:#14100A;border:3px solid var(--ink);border-radius:18px;padding:6px;box-sizing:border-box;box-shadow:4px 4px 0 var(--ink);transform:rotate(-8deg)">
+  <h2 class="abs ttl" style="left:120px;top:26px;font-size:60px;color:var(--ac);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:5px 5px 0 var(--ink);transform:rotate(-3deg)">OPTIONS!!</h2>
+
+  <!-- orbites -->
+  <div class="abs" style="left:420px;top:180px;width:420px;height:420px;border-radius:50%;border:3px dashed color-mix(in srgb,var(--ink) 45%,transparent)"></div>
+  <div class="abs" style="left:250px;top:40px;width:760px;height:700px;border-radius:50%;border:3px dashed color-mix(in srgb,var(--ink) 30%,transparent)"></div>
+
+  <!-- le soleil, c'est toi -->
+  <div class="abs" style="left:530px;top:290px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#ffe8a8,var(--ac) 60%,var(--acm));border:4px solid var(--ink);box-shadow:0 0 0 14px rgba(234,183,102,.35),0 0 0 28px rgba(234,183,102,.18),6px 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;z-index:3;animation:bob 3s ease-in-out infinite">
+    <div class="av l v2" style="width:84px;height:84px">ZA<span class="on"></span></div>
+    <b style="font:400 26px 'Bagel Fat One';color:#231705">Zack</b>
+  </div>
+  <div class="stk" style="left:760px;top:290px;background:var(--paper);transform:rotate(8deg);font:700 21px 'Caveat',cursive">← c'est toi le soleil</div>
+
+  <!-- planètes -->
+  <div class="card note" style="left:150px;top:150px;width:300px;height:250px;padding:16px;transform:rotate(-6deg);z-index:4">
+    <span class="tape" style="left:100px;top:-14px"></span>
+    <h3 class="ttl" style="font-size:22px">🪐 Compte</h3>
+    <div class="lbl" style="margin-top:12px">Nom d'affichage</div><div class="inp">Zack <svg class="i"><use href="#i-pen"/></svg></div>
+    <div class="lbl" style="margin-top:10px">Courriel</div><div class="inp">zack@exemple.ca <svg class="i"><use href="#i-pen"/></svg></div>
+  </div>
+  <div class="card skyc" style="left:820px;top:110px;width:300px;height:220px;padding:16px;transform:rotate(5deg);z-index:4">
+    <span class="pin" style="left:140px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:22px">🔔 Notifs</h3>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:12px">
+      <div class="knob" style="--k:50%;--r:0deg"><i></i></div>
+      <div style="font-weight:800;line-height:1.7"><div style="opacity:.55">◦ aucune</div><div>● <b>mentions</b></div><div style="opacity:.55">◦ toutes (chaos)</div></div>
+    </div>
+  </div>
+  <div class="card pinkc" style="left:880px;top:420px;width:330px;height:230px;padding:16px;transform:rotate(-4deg);z-index:4">
+    <span class="pin y" style="left:150px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:22px">🎨 Thème</h3>
+    <div class="big3" style="margin-top:12px"><span>☀️<br>Clair</span><span class="on">🌙<br>Sombre</span><span>🤖<br>Système</span></div>
+    <div class="hand" style="font-size:19px;margin-top:10px">le sombre, c'est pour 3h du matin</div>
+  </div>
+  <div class="card mintc" style="left:140px;top:450px;width:340px;height:200px;padding:16px;transform:rotate(4deg);z-index:4">
+    <span class="tape" style="left:120px;top:-14px;transform:rotate(-3deg)"></span>
+    <h3 class="ttl" style="font-size:22px">♿ Accessibilité</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px"><b>Langue</b><span class="inp" style="width:160px">🇫🇷 Français ▾</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px"><div><b>Réduire les animations</b><div class="hand" style="font-size:18px">arrête la galaxie de tourner</div></div><div class="lever on" role="switch" aria-checked="true"></div></div>
+  </div>
+
+  <!-- la comète du danger -->
+  <div class="abs" style="left:560px;top:620px;width:300px;height:22px;background:linear-gradient(90deg,transparent,rgba(196,87,63,.6));border-radius:999px;transform:rotate(-8deg)"></div>
+  <div class="card" style="left:840px;top:660px;width:260px;height:96px;padding:12px;transform:rotate(-8deg);z-index:4;background:repeating-linear-gradient(45deg,var(--paper) 0 14px,color-mix(in srgb,var(--ald) 18%,var(--paper)) 14px 28px)">
+    <b style="font:400 17px 'Bagel Fat One';color:var(--al)">☄️ comète du danger</b>
+    <div style="display:flex;gap:6px;margin-top:8px"><span class="btn sm danger">Supprimer le compte</span></div>
+  </div>
+  <div style="position:absolute;left:560px;top:536px;display:flex;gap:10px;z-index:4;transform:rotate(2deg)"><span class="btn pri">💾 Sauvegarder</span><span class="btn">👋 Déconnexion</span></div>
+  <div class="stk" style="left:1040px;top:34px;background:var(--lav);transform:rotate(-6deg)">v1.3.1 🚀</div>
+  <div class="abs" style="left:300px;top:690px;font-size:26px;transform:rotate(-20deg)">⭐</div>
+  <div class="abs" style="left:1160px;top:360px;font-size:22px;transform:rotate(14deg)">✨</div>
+  <div class="abs" style="left:470px;top:110px;font-size:20px">✦</div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>04</b>les paramètres du serveur, les membres sont une main de cartes 🃏</div>
+<div class="app">
+  <img src="logo.png" alt="WireChat" class="abs" style="left:28px;top:20px;width:74px;height:74px;object-fit:contain;background:#14100A;border:3px solid var(--ink);border-radius:18px;padding:6px;box-sizing:border-box;box-shadow:4px 4px 0 var(--ink);transform:rotate(-8deg)">
+
+  <!-- dossier avec onglets qui dépassent -->
+  <div class="abs" style="left:130px;top:22px;display:flex;gap:6px;z-index:2">
+    <span class="btn" style="border-radius:14px 14px 0 0;box-shadow:none;transform:translateY(8px)">Aperçu</span>
+    <span class="btn pri" style="border-radius:14px 14px 0 0;box-shadow:none">Membres</span>
+    <span class="btn" style="border-radius:14px 14px 0 0;box-shadow:none;transform:translateY(8px)">Ajouter</span>
+    <span class="btn" style="border-radius:14px 14px 0 0;box-shadow:none;transform:translateY(8px)">Canaux</span>
+  </div>
+  <div class="card note" style="left:120px;top:58px;width:620px;height:130px;padding:16px 20px;display:flex;align-items:center;gap:16px;transform:rotate(-.5deg)">
+    <div class="mag m2" style="position:static;width:86px;height:86px;font-size:30px;flex:none;animation:boing 2s ease-in-out infinite">ÉP</div>
+    <div style="flex:1"><div class="ttl" style="font-size:40px">Équipe projet</div><div class="hand" style="font-size:21px">12 membres · 4 canaux · c'est toi le boss 👑</div></div>
+    <span class="btn sm">← retour</span>
+  </div>
+
+  <!-- la main de cartes en éventail -->
+  <div class="abs" style="left:150px;top:260px;width:600px;height:480px">
+    <div class="tc holo" style="left:220px;top:110px;transform-origin:50% 140%;transform:rotate(-34deg)"><div class="hp"><span>ZACK</span><span>👑 99</span></div><div class="pic" style="background:#e98a6a"><div class="av l v2">ZA</div></div><b>Zack</b><small>Propriétaire du serveur<br>carte rare ✨</small></div>
+    <div class="tc" style="left:220px;top:110px;transform-origin:50% 140%;transform:rotate(-17deg)"><div class="hp"><span>ANA</span><span>⚡ 42</span></div><div class="pic" style="background:#f3d79a"><div class="av l v1">AN</div></div><b>Ana</b><small>Membre · en ligne</small><span class="btn sm danger" style="margin-top:auto">Retirer</span></div>
+    <div class="tc" style="left:220px;top:80px;transform-origin:50% 140%;transform:rotate(0deg);z-index:2;box-shadow:8px 10px 0 var(--ink)"><div class="hp"><span>MARC</span><span>🔥 37</span></div><div class="pic" style="background:#f7c9b8"><div class="av l v2">MA</div></div><b>Marc</b><small>Membre · en ligne</small><span class="btn sm danger" style="margin-top:auto">Retirer</span></div>
+    <div class="tc" style="left:220px;top:110px;transform-origin:50% 140%;transform:rotate(17deg);z-index:3"><div class="hp"><span>LÉA</span><span>💤 12</span></div><div class="pic" style="background:#cfe2f3"><div class="av l v4">LÉ</div></div><b>Léa</b><small>Membre · inactive</small><span class="btn sm danger" style="margin-top:auto">Retirer</span></div>
+    <div class="tc" style="left:220px;top:110px;transform-origin:50% 140%;transform:rotate(34deg);z-index:4"><div class="hp"><span>SOFIA</span><span>🌙 8</span></div><div class="pic" style="background:#e3d7f6"><div class="av l v5">SO</div></div><b>Sofia</b><small>Membre · hors ligne</small><span class="btn sm danger" style="margin-top:auto">Retirer</span></div>
+  </div>
+  <div class="stk" style="left:150px;top:700px;background:var(--paper);transform:rotate(-4deg);font:700 21px 'Caveat',cursive">+7 autres cartes dans le paquet · <u>tout voir</u></div>
+  <div class="boom" style="left:130px;top:250px;transform:rotate(-12deg);font-size:18px">12 membres!</div>
+
+  <!-- à droite : canaux en ruban de tickets, ajout, bouton rouge -->
+  <div class="abs" style="left:790px;top:30px;width:200px;z-index:2">
+    <h3 class="ttl" style="font-size:22px;color:var(--paper);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;margin-bottom:6px">Canaux 🎟️</h3>
+    <div class="card mintc" style="position:relative;padding:10px 12px;margin-bottom:-3px;transform:rotate(-3deg);border-radius:6px;box-shadow:3px 3px 0 var(--ink)"><b># général</b><span style="float:right" aria-label="Renommer">✏️ 🗑️</span></div>
+    <div class="card note" style="position:relative;padding:8px 10px;margin-bottom:-3px;transform:rotate(2deg);border-radius:6px;box-shadow:3px 3px 0 var(--ink);display:flex;gap:6px"><span class="inp" style="flex:1;height:30px;border-width:2px;font-size:14px">maquettes-v2</span><span class="btn sm pri">OK</span></div>
+    <div class="card skyc" style="position:relative;padding:10px 12px;margin-bottom:-3px;transform:rotate(-1deg);border-radius:6px;box-shadow:3px 3px 0 var(--ink)"><b># annonces</b><span style="float:right">✏️ 🗑️</span></div>
+    <div class="card pinkc" style="position:relative;padding:10px 12px;transform:rotate(3deg);border-radius:6px;box-shadow:3px 3px 0 var(--ink)"><b># hors-sujet</b><span style="float:right">✏️ 🗑️</span></div>
+    <span class="btn sm" style="margin-top:12px;transform:rotate(-2deg)"><svg class="i" style="width:14px"><use href="#i-plus"/></svg>Nouveau canal</span>
+  </div>
+  <div class="card lavc" style="left:1010px;top:40px;width:220px;height:280px;padding:14px;transform:rotate(4deg)">
+    <span class="pin y" style="left:100px;top:-9px"></span>
+    <h3 class="ttl" style="font-size:20px">Pige un pote</h3>
+    <div class="inp" style="margin:10px 0;color:var(--mu)">🔍 chercher…</div>
+    <div class="row"><div class="av s v3"></div><b style="flex:1">Tom</b><span class="btn sm pri">+</span></div>
+    <div class="row"><div class="av s v5"></div><b style="flex:1">Nina</b><span class="hand" style="font-size:19px">ajoutée ✔</span></div>
+    <div class="row"><div class="av s v1"></div><b style="flex:1">Jules</b><span class="btn sm pri">+</span></div>
+  </div>
+  <!-- le gros bouton rouge, littéralement -->
+  <div class="abs" style="left:880px;top:430px;width:300px;text-align:center">
+    <div style="width:180px;height:180px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff9a8a,#c4573f 55%,#7a2a1a);border:5px solid var(--ink);box-shadow:0 14px 0 #4a1a10,0 18px 0 var(--ink);display:grid;place-items:center;font:400 24px 'Bagel Fat One';color:#fff5e8;text-shadow:2px 2px 0 var(--ink);cursor:pointer">NE PAS<br>TOUCHER</div>
+    <div class="stk" style="position:relative;display:inline-block;margin-top:34px;background:var(--paper);transform:rotate(-3deg);font:700 20px 'Caveat',cursive;white-space:normal;width:260px">supprime le serveur, ses canaux et tous les messages, pour tout le monde 💀</div>
+  </div>
+</div>
+</main>
+<script>
+// Les yeux des avatars suivent la souris (désactivé si l'utilisateur réduit les animations).
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var eyes=document.querySelectorAll('.av');
+  document.addEventListener('mousemove',function(e){
+    eyes.forEach(function(a){
+      var r=a.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy)||1;
+      a.style.setProperty('--px',(50+dx/d*22)+'%');a.style.setProperty('--py',(50+dy/d*22)+'%');
+    });
+  });
+})();
+</script>
+</body>
+</html>

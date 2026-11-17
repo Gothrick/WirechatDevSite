@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Courrier web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=light]{--page:#E6DCCB;--bg:#f5efe9;--sf:#faf6f0;--panel:#f3ebe0;--fg:#201b17;--fg2:#3a3226;--mu:#6f6553;--rule:#d0c0a8;--strong:#201b17;--act:#8a6a2a;--soft:#e8d7b4;--al:#a22a2a;--glow:rgba(234,183,102,.22);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+[data-theme=dark]{--page:#0A0806;--bg:#100e0c;--sf:#17130f;--panel:#201b17;--fg:#f0ddb0;--fg2:#d8c69e;--mu:#9c8f74;--rule:#3a3226;--strong:#eab766;--act:#eab766;--soft:#2b241b;--al:#e08a72;--glow:rgba(234,183,102,.14);--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--ona:#231705}
+body{background:var(--page);color:var(--fg);font-family:'Public Sans',system-ui,sans-serif;padding:32px 24px 64px}
+.board{max-width:1280px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px}
+.board h1{font-family:'Newsreader',serif;font-weight:700;font-size:48px;line-height:1;margin:0}
+.board header p{margin:6px 0 0;color:var(--mu);max-width:60ch}
+.toggle{font:600 14px 'Public Sans',sans-serif;background:var(--sf);color:var(--fg);border:1px solid var(--strong);border-radius:4px;padding:10px 16px;cursor:pointer}
+.cap{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mu);margin:40px 0 10px;letter-spacing:.04em}
+.cap b{color:var(--fg)}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* frame */
+.app{width:1280px;height:800px;background:var(--bg);color:var(--fg);display:grid;grid-template-rows:56px minmax(0,1fr);overflow:hidden;border:1px solid var(--rule);box-shadow:0 20px 50px rgba(0,0,0,.12);font-size:15px;line-height:1.5}
+.mast{display:flex;align-items:stretch;gap:0;border-bottom:2px solid var(--strong);background:var(--sf);padding:0 16px 0 20px}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Newsreader',serif;font-weight:700;font-size:24px;padding-right:20px;border-right:1px solid var(--rule)}
+.brand img{width:30px;height:30px;object-fit:contain;background:#14100A;border-radius:4px;padding:2px;box-sizing:border-box}
+.tabs{display:flex;align-items:stretch;margin-left:8px;flex:1;min-width:0}
+.tab{display:flex;align-items:center;gap:8px;padding:0 16px;font-weight:600;font-size:14px;color:var(--mu);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer}
+.tab.on{color:var(--fg);border-bottom-color:var(--act)}
+.tab .n{font:500 12px 'JetBrains Mono',monospace;background:var(--fg);color:var(--bg);border-radius:3px;padding:1px 5px}
+.tab.add{color:var(--mu);font-size:20px;font-weight:400}
+.tools{display:flex;align-items:center;gap:10px}
+.search{display:flex;align-items:center;gap:8px;width:240px;height:36px;border:1px solid var(--rule);border-radius:4px;padding:0 10px;color:var(--mu);font-size:14px;background:var(--bg)}
+.search kbd{margin-left:auto;font:500 11px 'JetBrains Mono',monospace;border:1px solid var(--rule);border-radius:3px;padding:0 5px}
+.ib{position:relative;width:40px;height:40px;display:grid;place-items:center;border:0;background:transparent;color:var(--fg);border-radius:4px;cursor:pointer}
+.ib .n{position:absolute;top:3px;right:2px;font:500 11px 'JetBrains Mono',monospace;background:var(--al);color:var(--sf);border-radius:3px;padding:0 4px;line-height:16px}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:700 14px 'Public Sans',sans-serif;color:var(--ona);flex:none;position:relative}
+.av.l{width:44px;height:44px;font-size:16px}
+.av.s{width:28px;height:28px;font-size:12px}
+.b1{background:var(--a1)}.b2{background:var(--a2)}.b3{background:var(--a3)}.b4{background:var(--a4)}
+.pres{position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;border:2px solid var(--sf);background:var(--a3);box-sizing:border-box}
+.pres.away{background:var(--sf);box-shadow:inset 0 0 0 2px var(--mu)}
+.pres.off{background:var(--mu)}
+
+.split{display:grid;grid-template-columns:380px minmax(0,1fr);min-height:0}
+.list{border-right:1px solid var(--rule);display:flex;flex-direction:column;min-height:0;background:var(--sf)}
+.lh{padding:20px 20px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.lh h2{font-family:'Newsreader',serif;font-weight:700;font-size:30px;line-height:1.05;margin:0}
+.lh small{display:block;color:var(--mu);font-size:13px;margin-top:4px}
+.btn{font:600 14px 'Public Sans',sans-serif;height:36px;padding:0 14px;border-radius:4px;border:1px solid var(--strong);background:var(--sf);color:var(--fg);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.btn.pri{background:var(--ac);color:var(--onac);border-color:var(--act)}
+.btn.ghost{border-color:var(--rule)}
+.btn.danger{color:var(--al);border-color:var(--al);background:transparent}
+.chips{display:flex;gap:6px;padding:0 20px 12px;border-bottom:1px solid var(--rule)}
+.chip{font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--rule);color:var(--mu)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;padding:14px 20px;border-bottom:1px solid var(--rule);cursor:pointer;align-items:start}
+.item>:first-child{grid-row:span 2}
+.item.on{background:var(--soft);box-shadow:inset 4px 0 0 var(--ac)}
+.item .t{font-weight:700;font-size:15px;display:flex;gap:6px;align-items:baseline;min-width:0}
+.item .t span{color:var(--mu);font-family:'JetBrains Mono',monospace;font-weight:500}
+.item .p{grid-column:2;color:var(--mu);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.un .p{color:var(--fg)}
+.item time{font:500 12px 'JetBrains Mono',monospace;color:var(--mu);text-align:right}
+.item .cnt{grid-column:3;justify-self:end;font:500 12px 'JetBrains Mono',monospace;background:var(--ac);color:var(--onac);border-radius:3px;padding:0 6px;line-height:20px}
+.hash{width:36px;height:36px;border:1px solid var(--rule);border-radius:4px;display:grid;place-items:center;font:500 16px 'JetBrains Mono',monospace;color:var(--mu)}
+
+.read{display:flex;flex-direction:column;min-height:0;min-width:0}
+.rh{display:flex;align-items:center;gap:16px;padding:18px 32px 14px;border-bottom:1px solid var(--rule)}
+.rh h3{font-family:'Newsreader',serif;font-weight:700;font-size:32px;line-height:1;margin:0}
+.rh h3 span{color:var(--mu);font-weight:500}
+.rh small{display:block;color:var(--mu);font-size:13px;margin-top:4px}
+.stack{display:flex;margin-left:auto;align-items:center}
+.stack .av{border:2px solid var(--bg);margin-left:-10px}
+.stack em{font-style:normal;font-size:13px;color:var(--mu);margin-left:8px}
+.feed{flex:1;min-height:0;overflow:hidden;padding:8px 32px}
+.day{display:flex;align-items:center;gap:12px;font:500 12px 'JetBrains Mono',monospace;color:var(--mu);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+.day:after{content:"";flex:1;border-top:1px solid var(--rule)}
+.m{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;padding:10px 0;max-width:780px}
+.m.hov{background:linear-gradient(90deg,transparent,var(--soft) 3%,var(--soft) 97%,transparent);margin:0 -16px;padding:10px 16px;max-width:812px}
+.mh{display:flex;gap:10px;align-items:baseline}
+.mh b{font-weight:700}
+.mh time{font:500 12px 'JetBrains Mono',monospace;color:var(--mu)}
+.mh i{font-size:12px;color:var(--mu)}
+.mt{font-size:16px;line-height:1.55;margin-top:2px}
+.quote{border-left:3px solid var(--rule);padding:2px 0 2px 12px;color:var(--mu);font-size:14px;margin:4px 0 6px;font-family:'Newsreader',serif;font-style:italic}
+.quote b{font-family:'Public Sans',sans-serif;font-style:normal}
+.rx{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--rule);border-radius:999px;padding:2px 10px;font-size:13px;margin:8px 6px 0 0}
+.rx.mine{border-color:var(--act);background:var(--soft)}
+.acts{position:absolute;right:16px;top:-14px;display:flex;background:var(--sf);border:1px solid var(--rule);border-radius:4px}
+.acts .ib{width:34px;height:32px}
+.typing{padding:0 32px 6px;color:var(--mu);font-size:13px;font-style:italic;min-height:22px}
+.compose{border-top:1px solid var(--strong);padding:12px 32px 18px;background:var(--sf)}
+.replying{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu);margin-bottom:8px}
+.replying b{color:var(--fg)}
+.replying .ib{margin-left:auto;width:28px;height:28px}
+.cbox{display:flex;align-items:flex-end;gap:10px}
+.field{flex:1;min-height:44px;border:1px solid var(--rule);border-radius:4px;padding:10px 14px;box-sizing:border-box;color:var(--mu);font-size:16px;background:var(--bg)}
+
+/* home */
+.front{padding:28px 36px;overflow:hidden;min-height:0}
+.dateline{font:500 12px 'JetBrains Mono',monospace;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid var(--strong);padding-bottom:8px;display:flex;justify-content:space-between}
+.front h3{font-family:'Newsreader',serif;font-weight:700;font-size:56px;line-height:1;margin:18px 0 6px}
+.lede{font-family:'Newsreader',serif;font-size:20px;color:var(--mu);margin:0 0 22px;max-width:60ch}
+.cols{display:grid;grid-template-columns:1.2fr 1fr 1fr;border-top:1px solid var(--rule)}
+.col{padding:16px 22px 0;border-right:1px solid var(--rule)}
+.col:first-child{padding-left:0}.col:last-child{border-right:0;padding-right:0}
+.col h4{font:700 12px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.1em;margin:0 0 10px;display:flex;justify-content:space-between}
+.col h4 span{font-family:'JetBrains Mono',monospace;color:var(--mu)}
+.fr{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.fr .who{flex:1;min-width:0}
+.fr .who b{display:block}
+.fr .who small{color:var(--mu);font-size:13px}
+.req{padding:12px 0;border-bottom:1px solid var(--rule)}
+.req .row{display:flex;gap:8px;margin-top:10px}
+.note{padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.note time{display:block;font:500 12px 'JetBrains Mono',monospace;color:var(--mu)}
+.seg{display:flex;border:1px solid var(--strong);border-radius:4px;overflow:hidden;margin:0 20px 12px}
+.seg span{flex:1;text-align:center;font-weight:600;font-size:14px;padding:7px 0;color:var(--mu)}
+.seg span.on{background:var(--fg);color:var(--bg)}
+
+/* settings */
+.page{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:0}
+.toc{border-right:1px solid var(--rule);padding:28px 24px;background:var(--sf)}
+.toc h2{font-family:'Newsreader',serif;font-weight:700;font-size:36px;margin:0 0 4px;line-height:1}
+.toc p{color:var(--mu);font-size:13px;margin:0 0 20px}
+.toc a{display:flex;justify-content:space-between;color:var(--mu);text-decoration:none;font-weight:600;font-size:14px;padding:9px 0 9px 12px;border-left:2px solid var(--rule)}
+.toc a.on{color:var(--fg);border-left:3px solid var(--ac);padding-left:11px}
+.toc .ver{margin-top:24px;font:500 12px 'JetBrains Mono',monospace;color:var(--mu)}
+.doc{overflow:hidden;padding:20px 48px;min-height:0}
+.sec{max-width:760px;padding:12px 0 8px;border-bottom:1px solid var(--rule)}
+.sec h3{font-family:'Newsreader',serif;font-weight:700;font-size:26px;margin:0 0 2px}
+.sec>p{color:var(--mu);margin:0 0 10px;font-size:14px}
+.row2{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:center;padding:6px 0}
+.row2 label{font-weight:600}
+.row2 label small{display:block;font-weight:400;color:var(--mu);font-size:13px}
+.inp{height:40px;border:1px solid var(--rule);border-radius:4px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:var(--sf);font-size:15px;max-width:380px}
+.radios{display:flex;flex-direction:column;gap:6px}
+.radio{display:flex;align-items:center;gap:10px;font-size:15px}
+.radio i{width:18px;height:18px;border-radius:50%;border:2px solid var(--mu);box-sizing:border-box}
+.radio.on i{border:6px solid var(--ac)}
+.themes{display:flex;gap:12px}
+.th{width:120px;border:1px solid var(--rule);border-radius:4px;overflow:hidden;font-size:13px;font-weight:600}
+.th div{height:56px;border-bottom:1px solid var(--rule)}
+.th span{display:block;padding:6px 10px}
+.th.on{outline:3px solid var(--ac);outline-offset:2px}
+.sw{width:44px;height:24px;border-radius:999px;background:var(--rule);position:relative}
+.sw:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--sf)}
+.sw.on{background:var(--ac)}.sw.on:after{left:23px}
+
+/* server */
+.srvp{display:grid;grid-template-rows:auto auto minmax(0,1fr);min-height:0}
+.shead{display:flex;align-items:flex-end;gap:20px;padding:26px 40px 18px;background:var(--sf)}
+.crest{width:84px;height:84px;border:2px solid var(--strong);display:grid;place-items:center;font-family:'Newsreader',serif;font-weight:700;font-size:38px;border-radius:4px;background:var(--bg)}
+.shead h2{font-family:'Newsreader',serif;font-weight:700;font-size:46px;line-height:1;margin:0}
+.shead p{margin:6px 0 0;color:var(--mu)}
+.shead .btn{margin-left:auto}
+.stabs{display:flex;gap:4px;padding:0 40px;border-bottom:2px solid var(--strong);background:var(--sf)}
+.stabs span{padding:10px 14px;font-weight:600;color:var(--mu);border-bottom:3px solid transparent;margin-bottom:-2px}
+.stabs span.on{color:var(--fg);border-bottom-color:var(--act)}
+.sbody{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;padding:24px 40px;min-height:0;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font:700 12px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);padding:8px 10px;border-bottom:2px solid var(--strong)}
+td{padding:10px;border-bottom:1px solid var(--rule);vertical-align:middle}
+td .cell{display:flex;align-items:center;gap:12px}
+.role{font:500 12px 'JetBrains Mono',monospace;border:1px solid var(--rule);border-radius:3px;padding:1px 6px;color:var(--mu)}
+.role.own{border-color:var(--fg);color:var(--fg)}
+.aside h4{font:700 12px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.1em;margin:0 0 10px;padding-bottom:8px;border-bottom:2px solid var(--strong)}
+.box{border:1px solid var(--rule);padding:14px;margin-bottom:20px;background:var(--sf)}
+.box.dz{border-color:var(--al)}
+.box.dz h4{color:var(--al);border-color:var(--al)}
+.cand{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.cand b{flex:1}
+
+/* --- palette WireChat (src/styles/theme.css) + finition --- */
+body{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.board h1{color:var(--fg)}
+.board h1:after{content:"";display:block;width:64px;height:5px;margin-top:12px;background:linear-gradient(90deg,var(--ac),var(--acm));border-radius:3px;box-shadow:0 0 16px var(--glow)}
+.b2,.b4{color:#fff5e8}
+.sw.on{background:linear-gradient(180deg,var(--ac),var(--acm))}
+
+.app,.ph{border-color:var(--rule);box-shadow:0 24px 70px rgba(0,0,0,.28);background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.app{border-radius:12px}
+.mast{background:linear-gradient(180deg,var(--panel),var(--sf));border-bottom:1px solid var(--rule);box-shadow:0 1px 0 var(--glow)}
+.brand img{box-shadow:0 0 0 1px var(--acd),0 0 18px var(--glow)}
+.tab.on{color:var(--fg);border-bottom-color:var(--ac);background:linear-gradient(0deg,var(--glow),transparent 75%)}
+.tab .n,.item .cnt{background:var(--ac);color:var(--onac)}
+.ib .n,.tabbar .n{background:var(--ald);color:#fff5e8}
+.search,.srch{background:var(--bg);border-color:var(--rule)}
+.btn{border-color:var(--rule);background:var(--sf)}
+.btn.pri,.send{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd);box-shadow:inset 0 -2px 0 var(--acd)}
+.btn.danger{color:var(--al);border-color:var(--ald);background:transparent}
+.chip{border-color:var(--rule)}
+.chip.on,.seg span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd)}
+.seg{border-color:var(--rule)}
+.list{background:linear-gradient(180deg,var(--sf),var(--bg))}
+.item{border-color:var(--rule)}
+.item.on{background:linear-gradient(90deg,var(--glow),transparent);box-shadow:inset 3px 0 0 var(--ac)}
+.item.un .t:after{content:"";width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);align-self:center}
+.hash{background:var(--panel);border-color:var(--rule);color:var(--act)}
+.av{box-shadow:inset 0 0 0 1px rgba(255,245,232,.14)}
+.pres{background:var(--ok);border-color:var(--sf)}
+.rh{background:linear-gradient(180deg,var(--sf),var(--bg));border-color:var(--rule)}
+.rh h3 span,.top h3 span{color:var(--act)}
+.stack .av{border-color:var(--bg)}
+.day{color:var(--act)}
+.quote{border-left-color:var(--ac)}
+.rx{background:var(--sf);border-color:var(--rule)}
+.rx.mine{border-color:var(--ac);background:var(--glow)}
+.acts{background:var(--panel);border-color:var(--rule);box-shadow:0 4px 16px rgba(0,0,0,.28)}
+.typing{color:var(--act)}
+.compose{background:linear-gradient(180deg,var(--sf),var(--panel));border-top:1px solid var(--rule)}
+.field{background:var(--bg);border-color:var(--rule)}
+.cbox .field,.compose .field{box-shadow:0 0 0 3px var(--glow);border-color:var(--acd)}
+.front{background:radial-gradient(700px 320px at 0% 0%,var(--glow),transparent 70%)}
+.dateline{border-bottom:2px solid var(--ac);color:var(--act)}
+.front h3{font-size:62px}
+.col h4{color:var(--fg2)}
+.col h4 span{color:var(--act)}
+.fr,.req,.note,.cols,.col{border-color:var(--rule)}
+.toc{background:linear-gradient(180deg,var(--sf),var(--bg));border-color:var(--rule)}
+.toc a{border-left-color:var(--rule)}
+.toc a.on{border-left-color:var(--ac);color:var(--fg);background:linear-gradient(90deg,var(--glow),transparent)}
+.sec{border-color:var(--rule)}
+.inp{background:var(--bg);border-color:var(--rule)}
+.radio.on i{border-color:var(--ac);box-shadow:0 0 8px var(--glow)}
+.th{border-color:var(--rule)}
+.th.on{outline-color:var(--ac)}
+.shead{background:radial-gradient(600px 220px at 0% 0%,var(--glow),transparent 70%),var(--sf)}
+.crest{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd);box-shadow:inset 0 -3px 0 var(--acd),0 8px 24px var(--glow)}
+.stabs{background:var(--sf);border-bottom:1px solid var(--rule)}
+.stabs span.on{border-bottom-color:var(--ac);color:var(--fg)}
+th{border-bottom:2px solid var(--ac);color:var(--act)}
+td{border-color:var(--rule)}
+.role{border-color:var(--rule)}
+.role.own{border-color:var(--ac);color:var(--act)}
+.aside h4{border-bottom:2px solid var(--ac);color:var(--act)}
+.box{background:var(--sf);border-color:var(--rule);border-radius:8px}
+.cand{border-color:var(--rule)}
+.box.dz{border-color:var(--ald);background:linear-gradient(180deg,rgba(196,87,63,.10),transparent)}
+.box.dz h4{color:var(--al);border-color:var(--ald)}
+.toggle{border-color:var(--rule);background:var(--sf);color:var(--fg)}
+.status{color:var(--fg)}
+.big{background:radial-gradient(300px 140px at 0% 0%,var(--glow),transparent 70%)}
+.chips,.top,.tabbar,.m,.rowo,.chrow{border-color:var(--rule)}
+.chips,.top{border-bottom-color:var(--rule)}
+.tabbar{background:linear-gradient(180deg,var(--sf),var(--panel));border-top:1px solid var(--rule)}
+.tabbar span.on{color:var(--act)}
+.err{border-color:var(--ald);color:var(--al);background:rgba(196,87,63,.08)}
+.err button{border-color:var(--ald);color:var(--al)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6 6 0 013.5 6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div>
+    <h1>Courrier</h1>
+    <p>Une boîte de réception. Les serveurs deviennent des onglets en haut, tous les canaux d'un serveur s'affichent dans une seule liste avec l'aperçu du dernier message, et la conversation se lit dans un grand volet. Titres en serif, filets fins, palette WireChat : brun chaud, crème et ambre.</p>
+  </div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='light'?'dark':'light'">Changer de thème</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>01</b> · ACCUEIL : AMIS, DEMANDES ET CONVERSATIONS PRIVÉES</div>
+<div class="app">
+  <nav class="mast" aria-label="Navigation principale">
+    <div class="brand"><img src="logo.png" alt="">WireChat</div>
+    <div class="tabs">
+      <span class="tab on">Accueil</span>
+      <span class="tab">Équipe projet</span>
+      <span class="tab">Études <span class="n">3</span></span>
+      <span class="tab">Musique</span>
+      <span class="tab">Jeux vidéo <span class="n">12</span></span>
+      <span class="tab add" aria-label="Nouveau serveur">+</span>
+    </div>
+    <div class="tools">
+      <div class="search"><svg class="i"><use href="#i-search"/></svg>Rechercher<kbd>Ctrl K</kbd></div>
+      <button class="ib" aria-label="Notifications, 2 non lues"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></button>
+      <div class="av b2" aria-label="Profil">ZA</div>
+    </div>
+  </nav>
+  <div class="split">
+    <section class="list">
+      <div class="lh"><div><h2>Messages</h2><small>Conversations privées</small></div><button class="btn ghost"><svg class="i"><use href="#i-pen"/></svg>Nouvelle</button></div>
+      <div class="seg"><span class="on">Messages</span><span>Amis</span></div>
+      <div class="chips"><span class="chip on">Tous</span><span class="chip">Non lus · 4</span><span class="chip">Groupes</span></div>
+      <div class="item un"><div class="av b1">AN<span class="pres"></span></div><div class="t">Ana</div><time>14:02</time><div class="p">On valide la maquette demain ? J'ai préparé…</div><span class="cnt">2</span></div>
+      <div class="item un"><div class="av b3">ML</div><div class="t">Marc, Léa</div><time>13:40</time><div class="p">Léa : je vérifie le contraste ce soir</div><span class="cnt">2</span></div>
+      <div class="item"><div class="av b4">LÉ<span class="pres away"></span></div><div class="t">Léa</div><time>Hier</time><div class="p">Vous : Merci pour le lien !</div></div>
+      <div class="item"><div class="av b2">SO<span class="pres off"></span></div><div class="t">Sofia</div><time>Lun.</time><div class="p">Sofia : On se reparle après l'examen</div></div>
+      <div class="item"><div class="av b1">MA<span class="pres"></span></div><div class="t">Marc</div><time>12 nov.</time><div class="p">Vous : Parfait, à demain</div></div>
+    </section>
+    <section class="front">
+      <div class="dateline"><span>Lundi 17 novembre 2026</span><span>Édition de Zack</span></div>
+      <h3>Bonjour Zack.</h3>
+      <p class="lede">3 amis sont en ligne, une demande d'ami t'attend et tu as 15 messages non lus dans 2 serveurs.</p>
+      <div class="cols">
+        <div class="col">
+          <h4>Amis en ligne <span>3</span></h4>
+          <div class="fr"><div class="av b1">AN<span class="pres"></span></div><div class="who"><b>Ana</b><small>En ligne</small></div><button class="btn ghost">Écrire</button></div>
+          <div class="fr"><div class="av b1">MA<span class="pres"></span></div><div class="who"><b>Marc</b><small>En ligne</small></div><button class="btn ghost">Écrire</button></div>
+          <div class="fr"><div class="av b4">LÉ<span class="pres away"></span></div><div class="who"><b>Léa</b><small>Inactive</small></div><button class="btn ghost">Écrire</button></div>
+          <div class="fr"><div class="av b2">SO<span class="pres off"></span></div><div class="who"><b>Sofia</b><small>Hors ligne</small></div><button class="btn ghost">Écrire</button></div>
+        </div>
+        <div class="col">
+          <h4>Demandes en attente <span>1</span></h4>
+          <div class="req"><div style="display:flex;gap:12px;align-items:center"><div class="av b3">TO</div><div><b>Tom</b><br><small style="color:var(--mu)">Souhaite devenir ami</small></div></div><div class="row"><button class="btn pri">Accepter</button><button class="btn ghost">Refuser</button></div></div>
+          <div class="req" style="color:var(--mu);font-size:14px"><b style="color:var(--fg)">Nina</b> · Demande envoyée<br>En attente de réponse</div>
+          <button class="btn" style="margin-top:14px"><svg class="i"><use href="#i-plus"/></svg>Ajouter un contact</button>
+        </div>
+        <div class="col">
+          <h4>Activité <span>2</span></h4>
+          <div class="note"><time>14:11 · Équipe projet</time><b>Léa</b> t'a mentionné dans <b>#maquettes</b></div>
+          <div class="note"><time>13:52 · Jeux vidéo</time>12 nouveaux messages dans <b>#soirée-jeudi</b></div>
+          <div class="note"><time>Hier</time><b>Marc</b> t'a ajouté au serveur <b>Études</b></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>02</b> · CONVERSATION DANS UN CANAL (RÉPONSE, RÉACTIONS, SAISIE EN COURS)</div>
+<div class="app">
+  <nav class="mast" aria-label="Navigation principale">
+    <div class="brand"><img src="logo.png" alt="">WireChat</div>
+    <div class="tabs">
+      <span class="tab">Accueil</span>
+      <span class="tab on">Équipe projet</span>
+      <span class="tab">Études <span class="n">3</span></span>
+      <span class="tab">Musique</span>
+      <span class="tab">Jeux vidéo <span class="n">12</span></span>
+      <span class="tab add" aria-label="Nouveau serveur">+</span>
+    </div>
+    <div class="tools">
+      <div class="search"><svg class="i"><use href="#i-search"/></svg>Rechercher<kbd>Ctrl K</kbd></div>
+      <button class="ib" aria-label="Notifications, 2 non lues"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></button>
+      <div class="av b2" aria-label="Profil">ZA</div>
+    </div>
+  </nav>
+  <div class="split">
+    <section class="list">
+      <div class="lh"><div><h2>Équipe projet</h2><small>4 canaux · 12 membres</small></div><button class="ib" aria-label="Paramètres du serveur"><svg class="i"><use href="#i-gear"/></svg></button></div>
+      <div class="chips"><span class="chip on">Tous</span><span class="chip">Non lus</span><span class="chip">Mentions · 1</span></div>
+      <div class="item un on"><div class="hash">#</div><div class="t">maquettes</div><time>14:11</time><div class="p">Léa : Je vérifie le contraste du thème clair…</div><span class="cnt">@1</span></div>
+      <div class="item un"><div class="hash">#</div><div class="t">général</div><time>13:58</time><div class="p">Marc : Réunion déplacée à 15 h</div><span class="cnt">4</span></div>
+      <div class="item"><div class="hash">#</div><div class="t">annonces</div><time>Hier</time><div class="p">Zack : Version 1.3.1 en ligne</div></div>
+      <div class="item"><div class="hash">#</div><div class="t">hors-sujet</div><time>Ven.</time><div class="p">Sofia : quelqu'un a vu le match ?</div></div>
+      <div style="padding:16px 20px"><button class="btn ghost"><svg class="i"><use href="#i-plus"/></svg>Nouveau canal</button></div>
+    </section>
+    <section class="read">
+      <div class="rh">
+        <div><h3><span>#</span>maquettes</h3><small>Équipe projet · Les écrans et les retours de design</small></div>
+        <div class="stack" aria-label="Membres en ligne"><div class="av s b1">AN</div><div class="av s b1">MA</div><div class="av s b4">LÉ</div><div class="av s b2">ZA</div><em>4 en ligne sur 12</em></div>
+        <button class="btn ghost"><svg class="i"><use href="#i-users"/></svg>Membres</button>
+      </div>
+      <div class="feed">
+        <div class="day">Aujourd'hui</div>
+        <div class="m"><div class="av l b1">AN</div><div><div class="mh"><b>Ana</b><time>14:02</time></div><div class="mt">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div></div>
+        <div class="m"><div class="av l b1">MA</div><div><div class="mh"><b>Marc</b><time>14:05</time></div><div class="mt">Oui, je prépare le résumé des retours.</div></div></div>
+        <div class="m hov" style="position:relative"><div class="av l b2">ZA</div><div><div class="quote"><b>Ana</b> · On valide la maquette demain ?</div><div class="mh"><b>Zack</b><time>14:08</time><i>(modifié)</i></div><div class="mt">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div>
+          <div class="acts"><button class="ib" aria-label="Réagir"><svg class="i"><use href="#i-smile"/></svg></button><button class="ib" aria-label="Répondre"><svg class="i"><use href="#i-reply"/></svg></button></div></div>
+        <div class="m"><div class="av l b4">LÉ</div><div><div class="mh"><b>Léa</b><time>14:11</time></div><div class="mt"><b style="color:var(--act)">@Zack</b> je vérifie le contraste du thème clair ce soir.</div></div></div>
+      </div>
+      <div class="typing">Ana est en train d'écrire…</div>
+      <div class="compose">
+        <div class="replying"><svg class="i"><use href="#i-reply"/></svg>Réponse à <b>Léa</b> · « je vérifie le contraste du thème clair ce soir. »<button class="ib" aria-label="Annuler la réponse"><svg class="i"><use href="#i-x"/></svg></button></div>
+        <div class="cbox"><div class="field">Écrire dans #maquettes</div><button class="btn pri" style="height:44px">Envoyer<svg class="i"><use href="#i-send"/></svg></button></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>03</b> · OPTIONS : UNE SEULE PAGE QUI DÉFILE, AVEC UN SOMMAIRE</div>
+<div class="app">
+  <nav class="mast" aria-label="Navigation principale">
+    <div class="brand"><img src="logo.png" alt="">WireChat</div>
+    <div class="tabs">
+      <span class="tab">Accueil</span>
+      <span class="tab">Équipe projet</span>
+      <span class="tab">Études <span class="n">3</span></span>
+      <span class="tab">Musique</span>
+      <span class="tab">Jeux vidéo <span class="n">12</span></span>
+    </div>
+    <div class="tools">
+      <div class="search"><svg class="i"><use href="#i-search"/></svg>Rechercher une option<kbd>Ctrl K</kbd></div>
+      <div class="av b2" aria-label="Profil" style="outline:3px solid var(--ac);outline-offset:2px">ZA</div>
+    </div>
+  </nav>
+  <div class="page">
+    <aside class="toc">
+      <h2>Options</h2>
+      <p>Connecté en tant que Zack</p>
+      <a class="on" href="#">Compte</a>
+      <a href="#">Notifications</a>
+      <a href="#">Accessibilité</a>
+      <a href="#">Thème</a>
+      <a href="#">Session</a>
+      <div class="ver">WireChat 1.3.1 · c4-beta-3</div>
+    </aside>
+    <section class="doc">
+      <div class="sec">
+        <h3>Compte</h3><p>Ton nom et ton adresse, visibles par tes amis et tes serveurs.</p>
+        <div class="row2"><label>Nom d'affichage</label><div class="inp">Zack <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div></div>
+        <div class="row2"><label>Courriel</label><div class="inp">zack@exemple.ca <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div></div>
+      </div>
+      <div class="sec">
+        <h3>Notifications</h3>
+        <div class="row2"><label>Messages des serveurs<small>Ce qui peut t'interrompre</small></label><div class="radios"><span class="radio"><i></i>Aucune</span><span class="radio on"><i></i>Mentions uniquement</span><span class="radio"><i></i>Alertes instantanées</span></div></div>
+      </div>
+      <div class="sec">
+        <h3>Accessibilité</h3>
+        <div class="row2"><label>Langue</label><div class="inp">Français <span style="color:var(--mu)">▾</span></div></div>
+        <div class="row2"><label>Réduire les animations<small>Coupe les points de saisie animés</small></label><div class="sw on" role="switch" aria-checked="true"></div></div>
+      </div>
+      <div class="sec" style="border-bottom:0">
+        <h3>Thème</h3>
+        <div class="themes" style="margin-top:8px">
+          <div class="th"><div style="background:#f5efe9"></div><span>Clair</span></div>
+          <div class="th on"><div style="background:#100e0c;box-shadow:inset 0 -14px 0 #eab766"></div><span>Sombre</span></div>
+          <div class="th"><div style="background:linear-gradient(90deg,#f5efe9 50%,#100e0c 50%)"></div><span>Système</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>04</b> · PARAMÈTRES DU SERVEUR : ONGLET MEMBRES (VUE DU PROPRIÉTAIRE)</div>
+<div class="app">
+  <nav class="mast" aria-label="Navigation principale">
+    <div class="brand"><img src="logo.png" alt="">WireChat</div>
+    <div class="tabs">
+      <span class="tab">Accueil</span>
+      <span class="tab on">Équipe projet</span>
+      <span class="tab">Études <span class="n">3</span></span>
+      <span class="tab">Musique</span>
+      <span class="tab">Jeux vidéo <span class="n">12</span></span>
+      <span class="tab add" aria-label="Nouveau serveur">+</span>
+    </div>
+    <div class="tools">
+      <div class="search"><svg class="i"><use href="#i-search"/></svg>Rechercher<kbd>Ctrl K</kbd></div>
+      <button class="ib" aria-label="Notifications, 2 non lues"><svg class="i"><use href="#i-bell"/></svg><span class="n">2</span></button>
+      <div class="av b2" aria-label="Profil">ZA</div>
+    </div>
+  </nav>
+  <div class="srvp">
+    <div class="shead">
+      <div class="crest">ÉP</div>
+      <div><h2>Équipe projet</h2><p>12 membres · 4 canaux · Tu es propriétaire</p></div>
+      <button class="btn ghost">← Retour aux canaux</button>
+    </div>
+    <div class="stabs"><span>Aperçu</span><span class="on">Membres</span><span>Ajouter des membres</span><span>Canaux</span></div>
+    <div class="sbody">
+      <div>
+        <table>
+          <thead><tr><th>Membre</th><th>Statut</th><th>Rôle</th><th style="text-align:right">Action</th></tr></thead>
+          <tbody>
+            <tr><td><div class="cell"><div class="av b2">ZA</div><b>Zack</b></div></td><td>En ligne</td><td><span class="role own">Propriétaire du serveur</span></td><td></td></tr>
+            <tr><td><div class="cell"><div class="av b1">AN</div><b>Ana</b></div></td><td>En ligne</td><td><span class="role">Membre</span></td><td style="text-align:right"><button class="btn danger">Retirer</button></td></tr>
+            <tr><td><div class="cell"><div class="av b1">MA</div><b>Marc</b></div></td><td>En ligne</td><td><span class="role">Membre</span></td><td style="text-align:right"><button class="btn danger">Retirer</button></td></tr>
+            <tr><td><div class="cell"><div class="av b4">LÉ</div><b>Léa</b></div></td><td style="color:var(--mu)">Inactive</td><td><span class="role">Membre</span></td><td style="text-align:right"><button class="btn danger">Retirer</button></td></tr>
+            <tr><td><div class="cell"><div class="av b2">SO</div><b>Sofia</b></div></td><td style="color:var(--mu)">Hors ligne</td><td><span class="role">Membre</span></td><td style="text-align:right"><button class="btn danger">Retirer</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="aside">
+        <div class="box">
+          <h4>Ajout rapide</h4>
+          <div class="cand"><div class="av s b3">TO</div><b>Tom</b><button class="btn ghost">Ajouter</button></div>
+          <div class="cand"><div class="av s b4">NI</div><b>Nina</b><button class="btn ghost" disabled style="color:var(--mu)">Ajouté</button></div>
+        </div>
+        <div class="box dz">
+          <h4>Zone sensible</h4>
+          <p style="margin:0 0 12px;font-size:14px;color:var(--mu)">Supprimer le serveur efface ses canaux et leurs messages pour tous les membres.</p>
+          <button class="btn danger">Supprimer le serveur</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+</main>
+</body>
+</html>

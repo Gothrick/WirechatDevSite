@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pavage web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500;600&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=dark]{--page:#0A0806;--wall:#100e0c;--win:#17130f;--hi:#201b17;--bar:rgba(16,14,12,.88);--fg:#f0ddb0;--fg2:#d8c69e;--mu:#9c8f74;--line:#3a3226;--soft:#2b241b;--act:#eab766;--al:#e08a72;--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--glow:rgba(234,183,102,.16);--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--logo:.05}
+[data-theme=light]{--page:#E6DCCB;--wall:#ebe3d6;--win:#faf6f0;--hi:#f3ebe0;--bar:rgba(250,246,240,.9);--fg:#201b17;--fg2:#3a3226;--mu:#6f6553;--line:#d0c0a8;--soft:#e8d7b4;--act:#8a6a2a;--al:#a22a2a;--ac:#eab766;--acm:#d99a3f;--acd:#b98f4a;--onac:#231705;--ald:#c4573f;--ok:#23a55a;--glow:rgba(234,183,102,.28);--a1:#d49a42;--a2:#a96328;--a3:#c98a2e;--a4:#5c4520;--logo:.08}
+body{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .93 0 0 0 0 .8 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");color:var(--fg);font-family:'Hanken Grotesk',system-ui,sans-serif;padding:32px 24px 64px}
+.board{max-width:1280px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px}
+.board h1{font:800 52px 'Hanken Grotesk',sans-serif;letter-spacing:-.03em;line-height:1;margin:0}
+.board h1 span{font:500 16px 'Martian Mono',monospace;color:var(--act);letter-spacing:0;margin-left:12px}
+.board h1:after{content:"";display:block;width:64px;height:5px;margin-top:12px;background:linear-gradient(90deg,var(--ac),var(--acm));border-radius:3px;box-shadow:0 0 16px var(--glow)}
+.board header p{margin:8px 0 0;color:var(--mu);max-width:66ch}
+.toggle{font:500 12px 'Martian Mono',monospace;background:var(--win);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer}
+.cap{font:500 11px 'Martian Mono',monospace;color:var(--mu);margin:40px 0 10px}
+.cap b{color:var(--fg)}
+svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mono{font-family:'Martian Mono',monospace}
+
+/* bureau */
+.app{position:relative;width:1280px;height:800px;display:grid;grid-template-rows:36px minmax(0,1fr);overflow:hidden;border-radius:12px;font-size:14px;line-height:1.45;box-shadow:0 24px 70px rgba(0,0,0,.35);
+  background:radial-gradient(900px 500px at 85% 110%,rgba(234,183,102,.16),transparent 60%),radial-gradient(700px 420px at 0% -10%,rgba(169,99,40,.18),transparent 60%),var(--wall)}
+.app:before{content:"";position:absolute;inset:36px 0 0;background:url(logo.png) center/280px no-repeat;opacity:var(--logo);pointer-events:none}
+.bar{position:relative;z-index:2;display:flex;align-items:center;gap:6px;padding:0 10px;background:var(--bar);border-bottom:1px solid var(--line);font:500 11px 'Martian Mono',monospace;color:var(--mu);backdrop-filter:blur(8px)}
+.bar img{width:20px;height:20px;object-fit:contain;margin-right:4px;filter:drop-shadow(0 0 6px var(--glow))}
+.ws{position:relative;height:24px;min-width:24px;padding:0 8px;box-sizing:border-box;border-radius:6px;display:inline-flex;align-items:center;gap:6px;color:var(--mu);border:1px solid transparent}
+.ws b{font-weight:600;color:var(--fg2)}
+.ws.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);box-shadow:inset 0 -2px 0 var(--acd),0 0 14px var(--glow)}
+.ws.on b{color:var(--onac)}
+.ws.urg{border-color:var(--line)}
+.ws .u{min-width:16px;height:16px;line-height:16px;text-align:center;border-radius:4px;background:var(--ald);color:#fff5e8;font-size:10px;padding:0 3px;box-sizing:border-box}
+.ws.add{border:1px dashed var(--line)}
+.bar .mid{flex:1;text-align:center;color:var(--fg2)}
+.bar .mid em{font-style:normal;color:var(--act)}
+.pill{height:24px;display:inline-flex;align-items:center;gap:6px;padding:0 8px;border-radius:6px;background:var(--hi);border:1px solid var(--line);color:var(--fg2)}
+.pill .u{min-width:16px;height:16px;line-height:16px;text-align:center;border-radius:4px;background:var(--ald);color:#fff5e8;font-size:10px}
+.pill.ok{color:var(--fg2)}
+.pill.ok:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.me{width:24px;height:24px;border-radius:6px;background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);display:grid;place-items:center;font-weight:600;font-size:10px}
+
+.desk{position:relative;z-index:1;padding:10px;display:grid;gap:10px;min-height:0}
+.split{display:grid;gap:10px;min-height:0;min-width:0}
+.win{background:var(--win);border:2px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.win.focus{border-color:var(--ac);box-shadow:0 0 0 1px var(--acd),0 0 36px var(--glow),0 10px 30px rgba(0,0,0,.3)}
+.tt{height:30px;flex:none;display:flex;align-items:center;gap:8px;padding:0 6px 0 10px;font:500 11px 'Martian Mono',monospace;color:var(--mu);border-bottom:1px solid var(--line);background:var(--hi)}
+.win.focus .tt{color:var(--fg);background:linear-gradient(180deg,var(--glow),var(--hi))}
+.tt .ix{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;background:var(--soft);color:var(--fg2);font-size:10px}
+.win.focus .tt .ix{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac)}
+.tt .r{margin-left:auto;display:flex;gap:6px;align-items:center;color:var(--mu)}
+.tt kbd,kbd{font:500 10px 'Martian Mono',monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--mu);background:var(--win)}
+.tabs{display:flex;height:32px;flex:none;border-bottom:1px solid var(--line);background:var(--hi)}
+.tabs span{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font:500 11px 'Martian Mono',monospace;color:var(--mu);border-right:1px solid var(--line)}
+.tabs span:last-child{border:0}
+.tabs span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac)}
+.wb{flex:1;min-height:0;overflow:hidden;position:relative}
+.float{position:absolute;z-index:5;border-color:var(--ac);box-shadow:0 0 0 1px var(--acd),0 24px 70px rgba(0,0,0,.5),0 0 40px var(--glow)}
+.float .tt{color:var(--fg);background:linear-gradient(180deg,var(--glow),var(--hi))}
+.float .tt:before{content:"⧉";color:var(--act)}
+
+/* contenus */
+.av{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font:700 12px 'Hanken Grotesk',sans-serif;color:var(--onac);flex:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,245,232,.14)}
+.av.l{width:44px;height:44px;border-radius:12px;font-size:15px}
+.av.s{width:24px;height:24px;border-radius:6px;font-size:10px}
+.b1{background:var(--a1)}.b2{background:var(--a2);color:#fff5e8}.b3{background:var(--a3)}.b4{background:var(--a4);color:#fff5e8}
+.pr{position:absolute;right:-3px;bottom:-3px;width:10px;height:10px;border-radius:50%;border:2px solid var(--win);background:var(--ok)}
+.pr.away{background:var(--win);box-shadow:inset 0 0 0 2px var(--mu)}
+.pr.off{background:var(--mu)}
+.row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .w{flex:1;min-width:0}
+.row .w b{font-weight:700}
+.row .w small{display:block;color:var(--mu);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.sel{background:linear-gradient(90deg,var(--glow),transparent);box-shadow:inset 3px 0 0 var(--ac)}
+.cnt{font:600 10px 'Martian Mono',monospace;background:var(--ac);color:var(--onac);border-radius:4px;padding:1px 5px}
+.grp{font:600 10px 'Martian Mono',monospace;color:var(--act);text-transform:uppercase;letter-spacing:.08em;padding:10px 12px 4px}
+.btn{font:600 13px 'Hanken Grotesk',sans-serif;height:30px;padding:0 12px;border-radius:7px;border:1px solid var(--line);background:var(--hi);color:var(--fg);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.pri{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac);border-color:var(--acd);box-shadow:inset 0 -2px 0 var(--acd)}
+.btn.danger{color:var(--al);border-color:var(--ald);background:transparent}
+.btn.sm{height:26px;font-size:12px;padding:0 9px}
+.ch{display:flex;align-items:center;gap:8px;padding:7px 12px;color:var(--mu);font-weight:600}
+.ch .h{font-family:'Martian Mono',monospace;font-size:12px}
+.ch.on{color:var(--fg);background:linear-gradient(90deg,var(--glow),transparent);box-shadow:inset 3px 0 0 var(--ac)}
+.ch.un{color:var(--fg)}
+.ch .cnt{margin-left:auto}
+
+.feed{padding:6px 16px;display:flex;flex-direction:column;gap:2px}
+.day{display:flex;align-items:center;gap:10px;font:500 10px 'Martian Mono',monospace;color:var(--act);margin:8px 0;text-transform:uppercase;letter-spacing:.08em}
+.day:after{content:"";flex:1;border-top:1px dashed var(--line)}
+.m{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:8px;border-radius:8px}
+.m.hov{background:var(--soft)}
+.mh{display:flex;gap:8px;align-items:baseline}
+.mh b{font-weight:700}
+.mh time{font:400 10px 'Martian Mono',monospace;color:var(--mu)}
+.mh i{font-size:11px;color:var(--mu)}
+.mt{font-size:15px;margin-top:1px}
+.q{font-size:12px;color:var(--mu);border-left:2px solid var(--ac);padding-left:8px;margin-bottom:4px}
+.rx{display:inline-flex;align-items:center;gap:5px;height:24px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font:500 11px 'Martian Mono',monospace;margin:6px 4px 0 0;background:var(--hi)}
+.rx.mine{border-color:var(--ac);background:var(--glow)}
+.mention{color:var(--act);background:var(--glow);border-radius:4px;padding:0 3px;font-weight:600}
+.typing{display:flex;align-items:center;gap:8px;padding:2px 16px 6px;font:400 11px 'Martian Mono',monospace;color:var(--act)}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ac);box-shadow:0 0 6px var(--ac)}
+.comp{border-top:1px solid var(--line);padding:10px 12px;background:var(--hi)}
+.rp{display:flex;align-items:center;gap:6px;font:400 11px 'Martian Mono',monospace;color:var(--mu);padding-bottom:8px}
+.rp b{color:var(--fg)}
+.inp{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--acd);border-radius:8px;background:var(--win);padding:0 6px 0 12px;color:var(--mu);box-shadow:0 0 0 3px var(--glow)}
+.inp>span:first-child{flex:1}
+
+.field{height:34px;border:1px solid var(--line);border-radius:7px;background:var(--hi);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px}
+.lbl{font:600 10px 'Martian Mono',monospace;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg span{flex:1;text-align:center;padding:6px 0;font:500 11px 'Martian Mono',monospace;color:var(--mu);border-right:1px solid var(--line)}
+.seg span:last-child{border:0}
+.seg span.on{background:linear-gradient(180deg,var(--ac),var(--acm));color:var(--onac)}
+.sw{width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--win)}
+.sw.on{background:linear-gradient(180deg,var(--ac),var(--acm))}.sw.on:after{left:19px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.opt small{display:block;color:var(--mu);font-size:12px}
+.thm{display:flex;gap:8px}
+.thm div{flex:1;height:70px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:flex-end;padding:6px;box-sizing:border-box}
+.thm span{font:600 10px 'Martian Mono',monospace;background:#fff5e8;color:#231705;border-radius:4px;padding:1px 5px}
+.thm .on{outline:2px solid var(--ac);outline-offset:2px;box-shadow:0 0 18px var(--glow)}
+.pad{padding:12px 14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font:600 10px 'Martian Mono',monospace;color:var(--act);text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line)}
+td{padding:7px 12px;border-bottom:1px solid var(--line)}
+tr.sel td{background:var(--glow)}
+tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--ac)}
+.cell{display:flex;align-items:center;gap:10px}
+.tag{font:500 10px 'Martian Mono',monospace;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--mu)}
+.tag.own{color:var(--act);border-color:var(--ac)}
+.emo{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px}
+.emo span{height:34px;border-radius:7px;display:grid;place-items:center;font-size:18px;background:var(--hi)}
+.emo span.on{background:var(--glow);box-shadow:inset 0 0 0 1px var(--ac)}
+.hint{display:flex;gap:14px;flex-wrap:wrap;font:400 10px 'Martian Mono',monospace;color:var(--mu);padding:8px 12px;border-top:1px solid var(--line);background:var(--hi)}
+.big{font:800 46px 'Hanken Grotesk',sans-serif;letter-spacing:-.03em;line-height:1}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1>Pavage <span>// gestionnaire de fenêtres en mosaïque</span></h1><p>L'app se comporte comme un bureau en mosaïque. Chaque serveur est un espace de travail dans la barre du haut, et canaux, membres, amis ou réglages sont des fenêtres qui se partagent l'écran sans se chevaucher. La fenêtre active est bordée d'ambre. Les dialogues et le sélecteur de réactions flottent au-dessus. On peut tout faire au clavier avec <kbd>Super</kbd>.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark'">Changer de thème</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>01</b> · ACCUEIL : ESPACE « ~ », FENÊTRE MAÎTRESSE AMIS ET PILE À DROITE</div>
+<div class="app">
+  <nav class="bar" aria-label="Espaces de travail">
+    <img src="logo.png" alt="">
+    <span class="ws on"><b>~</b>accueil</span><span class="ws"><b>1</b>ÉP</span><span class="ws urg"><b>2</b>ÉT<span class="u">3</span></span><span class="ws"><b>3</b>MU</span><span class="ws urg"><b>4</b>JV<span class="u">12</span></span><span class="ws add">+</span>
+    <span class="mid"><em>amis</em> — 3 en ligne</span>
+    <span class="pill ok">connecté</span><span class="pill"><svg class="i" style="width:13px"><use href="#i-bell"/></svg><span class="u">2</span></span><span class="pill">14:12</span><span class="me">ZA</span>
+  </nav>
+  <div class="desk" style="grid-template-columns:1.05fr 1fr">
+    <section class="win focus">
+      <div class="tt"><span class="ix">1</span>amis<span class="r">maître · <kbd>Super</kbd>+<kbd>1</kbd></span></div>
+      <div class="wb">
+        <div style="padding:16px 16px 10px;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);background:radial-gradient(400px 160px at 0% 0%,var(--glow),transparent 70%)">
+          <div><div class="mono" style="font-size:10px;color:var(--act)">LUNDI 17 NOV.</div><div class="big">Salut Zack.</div><div style="color:var(--mu);margin-top:4px">15 non lus · 2 notifications · 1 demande</div></div>
+          <span class="btn"><svg class="i"><use href="#i-plus"/></svg>Ajouter un contact</span>
+        </div>
+        <div style="display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)"><span class="btn pri sm">Tous</span><span class="btn sm">En ligne</span><span class="btn sm">En attente</span><div class="field" style="margin-left:auto;width:200px;height:26px;color:var(--mu);justify-content:flex-start;gap:6px;font-size:12px"><svg class="i" style="width:13px"><use href="#i-search"/></svg>Rechercher</div></div>
+        <div class="grp">en ligne · 3</div>
+        <div class="row"><div class="av b1">AN<span class="pr"></span></div><div class="w"><b>Ana</b><small>En ligne</small></div><span class="btn sm">Écrire</span></div>
+        <div class="row sel"><div class="av b3">MA<span class="pr"></span></div><div class="w"><b>Marc</b><small>En ligne</small></div><span class="btn sm">Écrire</span><kbd>Entrée</kbd></div>
+        <div class="row"><div class="av b4">LÉ<span class="pr away"></span></div><div class="w"><b>Léa</b><small>Inactive</small></div><span class="btn sm">Écrire</span></div>
+        <div class="grp">hors ligne · 2</div>
+        <div class="row" style="opacity:.7"><div class="av b2">SO<span class="pr off"></span></div><div class="w"><b>Sofia</b><small>Indisponible hors ligne</small></div></div>
+        <div class="row" style="opacity:.7"><div class="av b1">NI</div><div class="w"><b>Nina</b><small>Demande envoyée</small></div><span class="tag">en attente</span></div>
+      </div>
+    </section>
+    <div class="split" style="grid-template-rows:auto minmax(0,1fr)">
+      <section class="win">
+        <div class="tt"><span class="ix">2</span>demandes<span class="r">1</span></div>
+        <div class="row" style="padding:12px"><div class="av l b2">TO</div><div class="w"><b style="font-size:16px">Tom</b><small>Souhaite devenir ami</small></div><span class="btn pri">Accepter</span><span class="btn">Refuser</span></div>
+      </section>
+      <div class="split" style="grid-template-columns:1.15fr 1fr">
+        <section class="win">
+          <div class="tt"><span class="ix">3</span>privés<span class="r"><svg class="i" style="width:13px"><use href="#i-plus"/></svg></span></div>
+          <div class="wb">
+            <div class="row"><div class="av b1">AN<span class="pr"></span></div><div class="w"><b>Ana</b><small>On valide la maquette demain ?</small></div><span class="cnt">2</span></div>
+            <div class="row"><div class="av b3">ML</div><div class="w"><b>Marc, Léa</b><small>Léa : je vérifie le contraste</small></div><span class="cnt">2</span></div>
+            <div class="row"><div class="av b4">LÉ<span class="pr away"></span></div><div class="w"><b>Léa</b><small>Vous : Merci pour le lien !</small></div></div>
+            <div class="row"><div class="av b2">SO<span class="pr off"></span></div><div class="w"><b>Sofia</b><small>On se reparle après l'examen</small></div></div>
+          </div>
+        </section>
+        <section class="win">
+          <div class="tt"><span class="ix">4</span>notifications<span class="r">2</span></div>
+          <div class="wb">
+            <div class="row" style="align-items:flex-start"><div class="av s b4">LÉ</div><div class="w"><b>Mention</b> dans <span class="mention">#maquettes</span><small>Équipe projet · 14:11</small></div></div>
+            <div class="row" style="align-items:flex-start"><div class="av s b3">MA</div><div class="w">Ajouté à <b>Études</b><small>Hier</small></div></div>
+            <div class="row" style="align-items:flex-start"><div class="av s b1">JV</div><div class="w"><b>12</b> messages dans <b>#soirée-jeudi</b><small>Jeux vidéo · 13:52</small></div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>02</b> · CONVERSATION : ESPACE 1, CANAL EN MAÎTRE, CANAUX ET MEMBRES EMPILÉS, SÉLECTEUR DE RÉACTIONS FLOTTANT</div>
+<div class="app">
+  <nav class="bar" aria-label="Espaces de travail">
+    <img src="logo.png" alt="">
+    <span class="ws"><b>~</b></span><span class="ws on"><b>1</b>Équipe projet</span><span class="ws urg"><b>2</b>ÉT<span class="u">3</span></span><span class="ws"><b>3</b>MU</span><span class="ws urg"><b>4</b>JV<span class="u">12</span></span><span class="ws add">+</span>
+    <span class="mid"><em>#maquettes</em> — Équipe projet</span>
+    <span class="pill ok">connecté</span><span class="pill"><svg class="i" style="width:13px"><use href="#i-bell"/></svg><span class="u">2</span></span><span class="pill">14:12</span><span class="me">ZA</span>
+  </nav>
+  <div class="desk" style="grid-template-columns:240px minmax(0,1fr) 250px">
+    <div class="split" style="grid-template-rows:minmax(0,1fr) auto">
+      <section class="win">
+        <div class="tt"><span class="ix">1</span>canaux<span class="r"><svg class="i" style="width:13px"><use href="#i-plus"/></svg></span></div>
+        <div class="wb" style="padding:6px 0">
+          <div class="grp">équipe projet</div>
+          <div class="ch un"><span class="h">#</span>général<span class="cnt">4</span></div>
+          <div class="ch on"><span class="h">#</span>maquettes</div>
+          <div class="ch"><span class="h">#</span>annonces</div>
+          <div class="ch"><span class="h">#</span>hors-sujet</div>
+        </div>
+      </section>
+      <section class="win">
+        <div class="tt"><span class="ix">2</span>privés</div>
+        <div class="row"><div class="av s b1">AN<span class="pr"></span></div><div class="w"><b>Ana</b></div><span class="cnt">2</span></div>
+        <div class="row"><div class="av s b3">ML</div><div class="w"><b>Marc, Léa</b></div><span class="cnt">2</span></div>
+      </section>
+    </div>
+    <section class="win focus">
+      <div class="tt"><span class="ix">3</span>#maquettes — Équipe projet<span class="r">maître · <kbd>Super</kbd>+<kbd>H</kbd><kbd>L</kbd></span></div>
+      <div class="wb">
+        <div class="feed">
+          <div class="day">aujourd'hui</div>
+          <div class="m"><div class="av b1">AN</div><div><div class="mh"><b>Ana</b><time>14:02</time></div><div class="mt">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><span class="rx mine">👍 3</span><span class="rx">👀 1</span></div></div>
+          <div class="m"><div class="av b3">MA</div><div><div class="mh"><b>Marc</b><time>14:05</time></div><div class="mt">Oui, je prépare le résumé des retours.</div></div></div>
+          <div class="m hov"><div class="av b2">ZA</div><div><div class="q"><b>Ana</b> · On valide la maquette demain ?</div><div class="mh"><b>Zack</b><time>14:08</time><i>(modifié)</i></div><div class="mt">Parfait. Les palettes seront dans le dossier avant 16 h.</div></div></div>
+          <div class="m"><div class="av b4">LÉ</div><div><div class="mh"><b>Léa</b><time>14:11</time></div><div class="mt"><span class="mention">@Zack</span> je vérifie le contraste du thème clair ce soir.</div></div></div>
+        </div>
+      </div>
+      <div class="typing"><i></i>ana écrit…</div>
+      <div class="comp">
+        <div class="rp"><svg class="i" style="width:13px"><use href="#i-reply"/></svg>réponse à <b>Léa</b> · <kbd>Échap</kbd> annuler</div>
+        <div class="inp"><span>Écrire dans #maquettes</span><kbd>Entrée</kbd><span class="btn pri"><svg class="i"><use href="#i-send"/></svg></span></div>
+      </div>
+    </section>
+    <section class="win">
+      <div class="tt"><span class="ix">4</span>membres<span class="r">12</span></div>
+      <div class="wb">
+        <div class="grp">en ligne · 4</div>
+        <div class="row"><div class="av s b2">ZA<span class="pr"></span></div><div class="w"><b>Zack</b><small>Propriétaire du serveur</small></div></div>
+        <div class="row"><div class="av s b1">AN<span class="pr"></span></div><div class="w"><b>Ana</b><small>En train d'écrire…</small></div></div>
+        <div class="row"><div class="av s b3">MA<span class="pr"></span></div><div class="w"><b>Marc</b></div></div>
+        <div class="row"><div class="av s b4">LÉ<span class="pr away"></span></div><div class="w"><b>Léa</b><small>Inactive</small></div></div>
+        <div class="grp">hors ligne · 8</div>
+        <div class="row" style="opacity:.6"><div class="av s b2">SO</div><div class="w"><b>Sofia</b></div></div>
+        <div class="row" style="opacity:.6"><div class="av s b1">TO</div><div class="w"><b>Tom</b></div></div>
+      </div>
+    </section>
+    <section class="win float" style="left:700px;top:196px;width:290px">
+      <div class="tt">réagir · message de Marc<span class="r"><kbd>Échap</kbd></span></div>
+      <div class="emo"><span class="on">👍</span><span>❤️</span><span>😂</span><span>👀</span><span>🎉</span><span>🔥</span><span>😮</span><span>😢</span><span>🙏</span><span>✅</span><span>💡</span><span>🤔</span></div>
+    </section>
+  </div>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>03</b> · OPTIONS : ESPACE « ⚙ » EN GRILLE, CONFIRMATION FLOTTANTE</div>
+<div class="app">
+  <nav class="bar" aria-label="Espaces de travail">
+    <img src="logo.png" alt="">
+    <span class="ws"><b>~</b></span><span class="ws"><b>1</b>ÉP</span><span class="ws urg"><b>2</b>ÉT<span class="u">3</span></span><span class="ws"><b>3</b>MU</span><span class="ws urg"><b>4</b>JV<span class="u">12</span></span><span class="ws on"><b>⚙</b>options</span>
+    <span class="mid"><em>options</em> — disposition grille</span>
+    <span class="pill ok">connecté</span><span class="pill">v1.3.1</span><span class="me">ZA</span>
+  </nav>
+  <div class="desk" style="grid-template-columns:1.1fr 1fr 1fr;grid-template-rows:1fr 1fr">
+    <section class="win" style="grid-row:1/3">
+      <div class="tt"><span class="ix">1</span>compte</div>
+      <div class="wb pad" style="display:flex;flex-direction:column">
+        <div style="display:flex;gap:14px;align-items:center;padding:6px 0 10px;border-bottom:1px solid var(--line)"><div class="av b2" style="width:72px;height:72px;border-radius:18px;font-size:26px">ZA</div><div><div class="big" style="font-size:36px">Zack</div><div style="color:var(--mu)">Actif · membre de 4 serveurs</div></div></div>
+        <div class="lbl">Nom d'affichage</div><div class="field">Zack <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div>
+        <div class="lbl">Courriel</div><div class="field">zack@exemple.ca <svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg></div>
+        <div style="display:flex;gap:8px;margin-top:16px"><span class="btn pri">Sauvegarder</span><span class="btn">Se déconnecter</span></div>
+        <div style="margin-top:auto;border:1px solid var(--ald);border-radius:8px;padding:10px 12px;background:rgba(196,87,63,.08)"><div class="mono" style="font-size:10px;color:var(--al);text-transform:uppercase">zone sensible</div><div style="font-size:13px;color:var(--mu);margin:4px 0 8px">Supprimer ton compte est définitif.</div><span class="btn danger sm">Supprimer le compte</span></div>
+      </div>
+    </section>
+    <section class="win">
+      <div class="tt"><span class="ix">2</span>notifications</div>
+      <div class="wb pad"><div class="lbl" style="margin-top:0">Messages des serveurs</div><div class="seg"><span>aucune</span><span class="on">mentions</span><span>toutes</span></div>
+        <div class="opt" style="margin-top:8px;border:0"><div>Bureau<small>Autorisées dans le navigateur</small></div><div class="sw on"></div></div></div>
+    </section>
+    <section class="win focus">
+      <div class="tt"><span class="ix">3</span>thème<span class="r"><kbd>Super</kbd>+<kbd>T</kbd></span></div>
+      <div class="wb pad"><div class="thm"><div style="background:#f5efe9"><span>clair</span></div><div class="on" style="background:#100e0c"><span>sombre</span></div><div style="background:linear-gradient(135deg,#f5efe9 50%,#100e0c 50%)"><span>système</span></div></div>
+        <div class="opt" style="margin-top:10px;border:0"><div>Fond d'écran<small>Logo en filigrane</small></div><div class="sw on"></div></div></div>
+    </section>
+    <section class="win" style="grid-column:2/4">
+      <div class="tt"><span class="ix">4</span>accessibilité</div>
+      <div class="wb pad" style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-content:start">
+        <div class="opt"><div>Langue</div><div class="field" style="width:150px;height:30px">Français <span style="color:var(--mu)">▾</span></div></div>
+        <div class="opt"><div>Réduire les animations<small>Points de saisie fixes</small></div><div class="sw on"></div></div>
+        <div class="opt" style="border:0"><div>Espace entre fenêtres<small>Mosaïque</small></div><div class="seg" style="width:150px"><span>0</span><span class="on">10</span><span>16</span></div></div>
+        <div class="opt" style="border:0"><div>Bordure active<small>Lueur ambre</small></div><div class="sw on"></div></div>
+      </div>
+    </section>
+    <section class="win float" style="left:560px;top:540px;width:340px">
+      <div class="tt">confirmation<span class="r"><kbd>Échap</kbd></span></div>
+      <div class="pad"><div style="font-size:17px;font-weight:700">Te déconnecter de WireChat ?</div><div style="color:var(--mu);font-size:13px;margin:4px 0 14px">Tes réglages restent enregistrés sur ce compte.</div><div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn">Annuler</span><span class="btn pri">Se déconnecter</span></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>04</b> · PARAMÈTRES DU SERVEUR : FENÊTRE À ONGLETS, CANAUX ET AJOUT EN PILE, CONFIRMATION FLOTTANTE</div>
+<div class="app">
+  <nav class="bar" aria-label="Espaces de travail">
+    <img src="logo.png" alt="">
+    <span class="ws"><b>~</b></span><span class="ws on"><b>1</b>Équipe projet</span><span class="ws urg"><b>2</b>ÉT<span class="u">3</span></span><span class="ws"><b>3</b>MU</span><span class="ws urg"><b>4</b>JV<span class="u">12</span></span><span class="ws add">+</span>
+    <span class="mid"><em>paramètres</em> — Équipe projet · propriétaire</span>
+    <span class="pill ok">connecté</span><span class="pill"><svg class="i" style="width:13px"><use href="#i-bell"/></svg><span class="u">2</span></span><span class="pill">14:12</span><span class="me">ZA</span>
+  </nav>
+  <div class="desk" style="grid-template-columns:minmax(0,1.5fr) 1fr">
+    <section class="win focus">
+      <div class="tt"><span class="ix">1</span>paramètres du serveur<span class="r">onglets · <kbd>Super</kbd>+<kbd>W</kbd></span></div>
+      <div class="tabs"><span>aperçu</span><span class="on">membres · 12</span><span>ajouter</span><span>canaux · 4</span></div>
+      <div class="wb">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;border-bottom:1px solid var(--line);background:radial-gradient(400px 140px at 0% 0%,var(--glow),transparent 70%)">
+          <div class="av" style="width:56px;height:56px;border-radius:14px;font-size:20px;background:linear-gradient(180deg,var(--ac),var(--acm));box-shadow:inset 0 -3px 0 var(--acd)">ÉP</div>
+          <div><div class="big" style="font-size:30px">Équipe projet</div><div style="color:var(--mu);font-size:13px">12 membres · 4 canaux · tu es propriétaire</div></div>
+          <span class="btn" style="margin-left:auto">← Retour aux canaux</span>
+        </div>
+        <table>
+          <thead><tr><th>Membre</th><th>Statut</th><th>Rôle</th><th style="text-align:right">Action</th></tr></thead>
+          <tbody>
+            <tr><td><div class="cell"><div class="av s b2">ZA</div><b>Zack</b></div></td><td>En ligne</td><td><span class="tag own">propriétaire du serveur</span></td><td></td></tr>
+            <tr><td><div class="cell"><div class="av s b1">AN</div><b>Ana</b></div></td><td>En ligne</td><td><span class="tag">membre</span></td><td style="text-align:right"><span class="btn danger sm">Retirer</span></td></tr>
+            <tr><td><div class="cell"><div class="av s b3">MA</div><b>Marc</b></div></td><td>En ligne</td><td><span class="tag">membre</span></td><td style="text-align:right"><span class="btn danger sm">Retirer</span></td></tr>
+            <tr class="sel"><td><div class="cell"><div class="av s b4">LÉ</div><b>Léa</b></div></td><td style="color:var(--mu)">Inactive</td><td><span class="tag">membre</span></td><td style="text-align:right"><span class="btn danger sm">Retirer</span></td></tr>
+            <tr><td><div class="cell"><div class="av s b2">SO</div><b>Sofia</b></div></td><td style="color:var(--mu)">Hors ligne</td><td><span class="tag">membre</span></td><td style="text-align:right"><span class="btn danger sm">Retirer</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="hint"><span><kbd>J</kbd><kbd>K</kbd> membre</span><span><kbd>Suppr</kbd> retirer</span><span><kbd>Tab</kbd> onglet suivant</span></div>
+    </section>
+    <div class="split" style="grid-template-rows:auto minmax(0,1fr) auto">
+      <section class="win">
+        <div class="tt"><span class="ix">2</span>aperçu</div>
+        <div class="pad" style="display:flex;gap:8px"><div class="field" style="flex:1">Équipe projet</div><span class="btn pri" style="height:34px">Enregistrer</span></div>
+      </section>
+      <section class="win">
+        <div class="tt"><span class="ix">3</span>canaux<span class="r"><svg class="i" style="width:13px"><use href="#i-plus"/></svg></span></div>
+        <div class="wb">
+          <div class="row"><span class="mono" style="color:var(--mu)">#</span><div class="w"><b>général</b></div><svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg><svg class="i" style="color:var(--mu)"><use href="#i-trash"/></svg></div>
+          <div class="row sel"><span class="mono" style="color:var(--act)">#</span><div class="field" style="flex:1;height:28px;border-color:var(--acd)">maquettes-v2</div><span class="btn pri sm">Enregistrer</span></div>
+          <div class="row"><span class="mono" style="color:var(--mu)">#</span><div class="w"><b>annonces</b></div><svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg><svg class="i" style="color:var(--mu)"><use href="#i-trash"/></svg></div>
+          <div class="row"><span class="mono" style="color:var(--mu)">#</span><div class="w"><b>hors-sujet</b></div><svg class="i" style="color:var(--mu)"><use href="#i-pen"/></svg><svg class="i" style="color:var(--mu)"><use href="#i-trash"/></svg></div>
+          <div class="row"><div class="field" style="flex:1;height:28px;color:var(--mu)">Nouveau canal</div><span class="btn sm">Créer</span></div>
+        </div>
+      </section>
+      <section class="win" style="border-color:var(--ald)">
+        <div class="tt" style="color:var(--al);background:rgba(196,87,63,.10);border-color:var(--ald)"><span class="ix" style="background:var(--ald);color:#fff5e8">4</span>zone sensible</div>
+        <div class="pad" style="display:flex;align-items:center;gap:10px"><span style="flex:1;color:var(--mu);font-size:13px">Efface les canaux et leurs messages pour tous.</span><span class="btn danger">Supprimer le serveur</span></div>
+      </section>
+    </div>
+    <section class="win float" style="left:330px;top:440px;width:330px">
+      <div class="tt">confirmation<span class="r"><kbd>Échap</kbd></span></div>
+      <div class="pad"><div style="display:flex;gap:10px;align-items:center"><div class="av b4">LÉ</div><div style="font-size:16px;font-weight:700">Retirer Léa du serveur ?</div></div><div style="color:var(--mu);font-size:13px;margin:8px 0 14px">Elle n'aura plus accès aux canaux d'Équipe projet.</div><div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn">Annuler</span><span class="btn danger" style="background:var(--ald);color:#fff5e8">Retirer</span></div></div>
+    </section>
+  </div>
+</div>
+</main>
+</body>
+</html>

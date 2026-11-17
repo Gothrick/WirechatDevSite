@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr" data-theme="nuit">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Velours web - WireChat redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,600;1,6..96,800&family=Pinyon+Script&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+html,body{margin:0}
+[data-theme=nuit]{--page:#0a0506;--bg:#100e0c;--velvet:#2a0a12;--wine:#4a1220;--plum:#5c1830;--satin:#7a2238;--fg:#f6e6cc;--mu:#c9a9a0;--gold:#eab766;--goldd:#b98f4a;--goldl:#ffe2a6;--lip:#d4304a;--lipd:#a31f37;--onlip:#fff3ec;--ongold:#231705;--line:rgba(234,183,102,.28);--ok:#23a55a;--neon:#ff6b8a}
+[data-theme=aube]{--page:#efe2d6;--bg:#f5efe9;--velvet:#f3dcd8;--wine:#e9c4c4;--plum:#e3b3b8;--satin:#d98f9b;--fg:#2a0a12;--mu:#6e4a50;--gold:#b98f4a;--goldd:#8a6a2a;--goldl:#8a6a2a;--lip:#b8243f;--lipd:#8f1a30;--onlip:#fff3ec;--ongold:#231705;--line:rgba(138,106,42,.35);--ok:#23a55a;--neon:#b8243f}
+body{background:var(--page);color:var(--fg);font-family:'Manrope',system-ui,sans-serif;padding:36px 24px 64px}
+.board{max-width:1280px;margin:0 auto}
+.board>header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:28px}
+.board h1{font:italic 800 96px/1 'Bodoni Moda',serif;margin:0;letter-spacing:-.03em;background:linear-gradient(100deg,var(--goldl),var(--gold) 40%,var(--lip) 75%,var(--goldl));-webkit-background-clip:text;background-clip:text;color:transparent}
+.board h1 span{font:400 46px 'Pinyon Script',cursive;color:var(--neon);-webkit-text-fill-color:var(--neon);text-shadow:0 0 8px var(--neon),0 0 24px var(--lip);margin-left:14px;vertical-align:middle}
+.board header p{margin:10px 0 0;color:var(--mu);max-width:62ch;font-size:15px}
+.toggle{font:italic 600 18px 'Bodoni Moda',serif;background:linear-gradient(135deg,var(--lip),var(--lipd));color:var(--onlip);border:1px solid var(--gold);border-radius:999px;padding:12px 22px;cursor:pointer;box-shadow:0 8px 30px rgba(212,48,74,.35)}
+.cap{font:italic 500 22px 'Bodoni Moda',serif;color:var(--mu);margin:48px 0 12px;display:flex;align-items:baseline;gap:12px}
+.cap b{font:400 34px 'Pinyon Script',cursive;color:var(--gold)}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.abs{position:absolute}
+.script{font-family:'Pinyon Script',cursive;font-weight:400}
+.serif{font-family:'Bodoni Moda',serif}
+
+@keyframes flick{0%,100%{opacity:1}42%{opacity:1}43%{opacity:.4}44%{opacity:1}71%{opacity:.85}72%{opacity:1}}
+@keyframes shimmer{to{background-position:200% 0}}
+@keyframes sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
+@keyframes heart{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}45%{transform:scale(1.1)}}
+
+/* salon */
+.app{position:relative;width:1280px;height:800px;overflow:hidden;border-radius:28px;font-size:15px;line-height:1.5;color:var(--fg);
+  background:radial-gradient(900px 520px at 80% -10%,rgba(212,48,74,.30),transparent 60%),radial-gradient(800px 500px at 0% 110%,rgba(234,183,102,.16),transparent 60%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 38px,rgba(255,255,255,.03) 38px 40px,transparent 40px 76px),linear-gradient(180deg,var(--velvet),var(--bg));
+  box-shadow:0 0 0 1px var(--gold),0 0 0 7px var(--velvet),0 0 0 8px var(--goldd),0 30px 90px rgba(163,31,55,.35)}
+.satin{background:linear-gradient(135deg,var(--wine),var(--plum) 45%,var(--satin) 60%,var(--wine) 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,226,166,.18),0 18px 40px rgba(0,0,0,.35)}
+[data-theme=aube] .satin{background:linear-gradient(135deg,#fbefe8,var(--wine) 50%,#fbefe8);box-shadow:inset 0 1px 0 #fff,0 18px 40px rgba(120,40,50,.18)}
+.arch{position:absolute;border-radius:999px 999px 26px 26px;padding:30px 22px 22px;box-sizing:border-box}
+.pill{position:absolute;border-radius:999px;box-sizing:border-box}
+.panel{position:absolute;border-radius:30px;padding:22px 24px;box-sizing:border-box}
+.ttl{font:italic 600 30px/1.05 'Bodoni Moda',serif;margin:0 0 4px}
+.ttl em{font:400 34px 'Pinyon Script',cursive;color:var(--gold);font-style:normal}
+.kicker{font:700 11px 'Manrope';letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.neon{font:400 54px 'Pinyon Script',cursive;color:var(--neon);text-shadow:0 0 6px var(--neon),0 0 18px var(--lip),0 0 40px var(--lip);animation:flick 5s infinite}
+.gold{background:linear-gradient(90deg,var(--goldd),var(--goldl),var(--gold),var(--goldd));background-size:200% 100%;animation:shimmer 6s linear infinite}
+
+.av{position:relative;width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font:italic 600 15px 'Bodoni Moda';color:var(--ongold);box-shadow:0 0 0 2px var(--bg),0 0 0 3px var(--gold)}
+.av.s{width:32px;height:32px;font-size:12px}
+.av.l{width:72px;height:72px;font-size:24px}
+.av.xl{width:150px;height:150px;font-size:52px;box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--gold),0 0 60px rgba(234,183,102,.45)}
+.p1{background:radial-gradient(circle at 35% 30%,#ffe2a6,#d49a42)}.p2{background:radial-gradient(circle at 35% 30%,#ffb4a6,#c4573f);color:var(--onlip)}.p3{background:radial-gradient(circle at 35% 30%,#ffd0dc,#d4304a);color:var(--onlip)}.p4{background:radial-gradient(circle at 35% 30%,#e6c7ff,#8a4a9a);color:var(--onlip)}.p5{background:radial-gradient(circle at 35% 30%,#f6e6cc,#a96328);color:var(--onlip)}
+.av .on{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--bg),0 0 10px var(--ok)}
+.av .away{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 2px var(--gold)}
+
+.btn{font:700 13px 'Manrope';letter-spacing:.06em;height:40px;padding:0 20px;border-radius:999px;border:1px solid var(--gold);background:transparent;color:var(--fg);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.btn.lip{background:linear-gradient(135deg,var(--lip),var(--lipd));color:var(--onlip);border-color:var(--lip);box-shadow:0 6px 24px rgba(212,48,74,.4)}
+.btn.gold{color:var(--ongold);border-color:var(--goldl)}
+.btn.sm{height:32px;padding:0 14px;font-size:12px}
+.btn.ghost{border-color:var(--line);color:var(--mu)}
+.badge{font:800 11px 'Manrope';background:var(--lip);color:var(--onlip);border-radius:999px;padding:2px 8px;box-shadow:0 0 12px rgba(212,48,74,.5)}
+.row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row .w{flex:1;min-width:0}
+.row .w b{font:italic 600 18px 'Bodoni Moda'}
+.row .w small{display:block;color:var(--mu);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* collier de perles = serveurs */
+.pearl{position:absolute;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font:italic 700 17px 'Bodoni Moda';color:#3a2410;cursor:pointer;
+  background:radial-gradient(circle at 32% 28%,#fff 0 8%,#fbeedd 22%,#e9cfae 60%,#c9a47c 100%);box-shadow:0 6px 14px rgba(0,0,0,.45),inset -4px -6px 10px rgba(120,80,40,.25)}
+.pearl.on{background:radial-gradient(circle at 32% 28%,#fff 0 8%,#ffd0dc 25%,var(--lip) 70%,var(--lipd));color:var(--onlip);box-shadow:0 0 0 3px var(--gold),0 0 30px rgba(212,48,74,.6)}
+.pearl .n{position:absolute;top:-6px;right:-8px;font:800 10px 'Manrope';background:var(--gold);color:var(--ongold);border-radius:999px;padding:1px 6px}
+
+/* conversation */
+.bub{max-width:430px;padding:14px 20px;border-radius:26px 26px 26px 6px;font-size:16px;background:rgba(255,236,220,.08);border:1px solid var(--line);backdrop-filter:blur(4px)}
+[data-theme=aube] .bub{background:#fffaf5}
+.me .bub{border-radius:26px 26px 6px 26px;background:linear-gradient(135deg,var(--lip),var(--lipd));color:var(--onlip);border-color:var(--lip);box-shadow:0 10px 30px rgba(212,48,74,.35)}
+.msg{position:absolute;display:flex;gap:12px;align-items:flex-end}
+.msg.me{flex-direction:row-reverse}
+.who{font:italic 400 14px 'Bodoni Moda';color:var(--gold);margin:0 0 4px 10px}
+.who time{font:600 11px 'Manrope';color:var(--mu);margin-left:8px;font-style:normal}
+.me .who{text-align:right;margin:0 10px 4px 0}
+.rx{display:inline-flex;align-items:center;gap:5px;font:700 12px 'Manrope';border:1px solid var(--line);border-radius:999px;padding:2px 10px;margin:8px 4px 0 0}
+.rx.mine{border-color:var(--lip);background:rgba(212,48,74,.2)}
+.ment{font:italic 700 16px 'Bodoni Moda';color:var(--goldl);border-bottom:1px solid var(--gold)}
+[data-theme=aube] .ment{color:var(--lipd)}
+.q{font:italic 400 13px 'Bodoni Moda';opacity:.8;border-left:2px solid var(--gold);padding-left:8px;margin-bottom:6px}
+
+/* miroir */
+.mirror{position:absolute;border-radius:50%;background:radial-gradient(ellipse at 35% 25%,rgba(255,255,255,.22),transparent 40%),radial-gradient(ellipse at 50% 50%,#3a2a30,#1a1014);box-shadow:0 0 0 10px var(--goldd),0 0 0 14px var(--gold),0 0 0 16px var(--goldd),0 30px 70px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+[data-theme=aube] .mirror{background:radial-gradient(ellipse at 35% 25%,#fff,transparent 45%),radial-gradient(ellipse at 50% 50%,#f3e6e0,#d9c2bc)}
+.bulb{position:absolute;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fff,var(--goldl) 50%,var(--gold));box-shadow:0 0 14px var(--goldl),0 0 30px rgba(234,183,102,.6)}
+.tag{position:absolute;padding:16px 18px;box-sizing:border-box;border-radius:22px}
+.sw{width:54px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;box-shadow:inset 0 0 0 1px var(--gold)}
+.sw:after{content:"";position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#c9a47c)}
+.sw.on{background:linear-gradient(135deg,var(--lip),var(--lipd))}.sw.on:after{left:28px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips span{font:italic 600 15px 'Bodoni Moda';padding:6px 14px;border-radius:999px;border:1px solid var(--line);color:var(--mu)}
+.chips span.on{background:linear-gradient(135deg,var(--lip),var(--lipd));border-color:var(--lip);color:var(--onlip)}
+.field{height:44px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:600}
+[data-theme=aube] .field{background:#fffaf5}
+
+/* liste VIP */
+.rope{position:absolute;height:26px;border-radius:999px;background:repeating-linear-gradient(-45deg,var(--lip) 0 10px,var(--lipd) 10px 20px);box-shadow:inset 0 3px 6px rgba(255,255,255,.25),0 8px 20px rgba(0,0,0,.4)}
+.post{position:absolute;width:30px;height:150px;border-radius:15px 15px 6px 6px;background:linear-gradient(90deg,var(--goldd),var(--goldl),var(--gold),var(--goldd))}
+.post:before{content:"";position:absolute;left:-7px;top:-22px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--goldl) 30%,var(--gold) 60%,var(--goldd))}
+.vip{display:grid;grid-template-columns:44px 1fr auto auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line)}
+.vip:last-child{border:0}
+.vip b{font:italic 600 19px 'Bodoni Moda'}
+.vip small{display:block;color:var(--mu);font-size:12px}
+.status{font:700 11px 'Manrope';letter-spacing:.14em;text-transform:uppercase}
+.curtain{position:absolute;top:0;bottom:0;width:150px;background:repeating-linear-gradient(90deg,var(--lipd) 0 14px,var(--lip) 14px 22px,#7a1428 22px 34px);box-shadow:inset -20px 0 40px rgba(0,0,0,.5)}
+.curtain.r{box-shadow:inset 20px 0 40px rgba(0,0,0,.5)}
+
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-7z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 016 6v5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+</svg>
+
+<main class="board">
+<header>
+  <div><h1>Velours<span>ouvert tard</span></h1>
+  <p>WireChat version lounge de nuit : velours bordeaux, satin, rouge à lèvres et or. Les serveurs sont un collier de perles, ta photo trône dans un miroir de loge, les membres sont sur la liste VIP derrière un cordon de velours, et tout est en courbes. La palette reste chaude, avec la base brun et ambre de WireChat.</p></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='nuit'?'aube':'nuit'">Allumer la lumière ☾</button>
+</header>
+
+<!-- 01 ACCUEIL -->
+<div class="cap"><b>un</b>l'accueil, ou le hall d'entrée</div>
+<div class="app">
+  <!-- collier de perles -->
+  <svg class="abs" style="left:0;top:0" width="1280" height="160" aria-hidden="true"><path d="M-10 20 Q 640 200 1290 20" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity=".7"/></svg>
+  <div class="pearl on" style="left:262px;top:52px" title="Accueil">⌂</div>
+  <div class="pearl" style="left:420px;top:84px">ÉP</div>
+  <div class="pearl" style="left:580px;top:98px">ÉT<span class="n">3</span></div>
+  <div class="pearl" style="left:740px;top:94px">MU</div>
+  <div class="pearl" style="left:900px;top:76px">JV<span class="n">12</span></div>
+  <div class="pearl" style="left:1050px;top:44px;background:transparent;box-shadow:inset 0 0 0 1px var(--gold);color:var(--gold)" title="Nouveau serveur">+</div>
+  <img src="logo.png" alt="WireChat" class="abs" style="left:30px;top:24px;width:66px;height:66px;object-fit:contain;border-radius:50%;background:#14100A;padding:8px;box-sizing:border-box;box-shadow:0 0 0 2px var(--gold),0 0 30px rgba(234,183,102,.35)">
+  <div class="abs" style="right:34px;top:28px;display:flex;gap:10px;align-items:center"><span class="btn sm ghost"><svg class="i"><use href="#i-search"/></svg></span><span class="btn sm ghost" style="position:relative"><svg class="i"><use href="#i-bell"/></svg><span class="badge" style="position:absolute;top:-8px;right:-8px">2</span></span></div>
+
+  <div class="abs" style="left:60px;top:190px;width:520px">
+    <div class="kicker">lundi 17 novembre · 23 h 47</div>
+    <div style="font:italic 400 92px/0.95 'Bodoni Moda',serif;margin:8px 0 0">Bonsoir,</div>
+    <div style="font:italic 800 92px/0.95 'Bodoni Moda',serif;background:linear-gradient(100deg,var(--goldl),var(--gold) 50%,var(--lip));-webkit-background-clip:text;background-clip:text;color:transparent">Zack.</div>
+    <p style="font:italic 400 21px 'Bodoni Moda';color:var(--mu);max-width:440px;margin:14px 0 22px">Quinze messages t'attendent, Léa a murmuré ton nom dans #maquettes, et quelqu'un aimerait faire ta connaissance.</p>
+    <div style="display:flex;gap:10px"><span class="btn lip">Tout lire <span class="badge" style="background:var(--onlip);color:var(--lipd)">15</span></span><span class="btn">Mes notifications</span></div>
+  </div>
+  <div class="neon abs" style="left:96px;top:660px;transform:rotate(-6deg)">ouvert tard</div>
+
+  <!-- demande en arche -->
+  <div class="arch satin" style="left:620px;top:200px;width:230px;height:330px;text-align:center">
+    <div class="kicker">une invitation</div>
+    <div class="av l p3" style="margin:16px auto 10px">TO</div>
+    <div class="ttl">Tom</div>
+    <div class="script" style="font-size:26px;color:var(--gold);line-height:1">aimerait être ton ami</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;align-items:center"><span class="btn lip sm">Accepter 💋</span><span class="btn sm ghost">Décliner poliment</span></div>
+  </div>
+  <!-- privés en arche haute -->
+  <div class="arch satin" style="left:880px;top:180px;width:360px;height:580px">
+    <div class="kicker" style="text-align:center">en tête-à-tête</div>
+    <div class="ttl" style="text-align:center;margin-bottom:12px">Messages <em>privés</em></div>
+    <div class="row"><div class="av p1">AN<span class="on"></span></div><div class="w"><b>Ana</b><small>On valide la maquette demain ?</small></div><span class="badge">2</span></div>
+    <div class="row"><div class="av p3">ML</div><div class="w"><b>Marc &amp; Léa</b><small>Léa : je vérifie le contraste</small></div><span class="badge">2</span></div>
+    <div class="row"><div class="av p4">LÉ<span class="away"></span></div><div class="w"><b>Léa</b><small>Vous : Merci pour le lien !</small></div></div>
+    <div class="row"><div class="av p5">SO</div><div class="w"><b>Sofia</b><small>On se reparle après l'examen</small></div></div>
+    <div class="kicker" style="margin-top:18px">ce soir</div>
+    <div class="row"><div class="w"><b style="font-size:15px">Léa</b> t'a mentionné dans <span class="ment">#maquettes</span><small>14:11 · Équipe projet</small></div></div>
+    <div class="row"><div class="w"><b style="font-size:15px">Marc</b> t'a ajouté à <i>Études</i><small>hier</small></div></div>
+    <div style="text-align:center;margin-top:12px"><span class="btn sm"><svg class="i"><use href="#i-pen"/></svg>Écrire à quelqu'un</span></div>
+  </div>
+  <!-- amis en ligne : pilule -->
+  <div class="pill satin" style="left:600px;top:570px;width:260px;padding:18px 20px">
+    <div class="kicker">sur la piste · 3</div>
+    <div style="display:flex;margin-top:12px"><div class="av p1">AN<span class="on"></span></div><div class="av p2" style="margin-left:-8px">MA<span class="on"></span></div><div class="av p4" style="margin-left:-8px">LÉ<span class="away"></span></div><span style="margin-left:12px;font:italic 400 15px 'Bodoni Moda';color:var(--mu);align-self:center">+2 au vestiaire</span></div>
+    <div style="margin-top:12px"><span class="btn sm ghost"><svg class="i"><use href="#i-plus"/></svg>Ajouter un contact</span></div>
+  </div>
+</div>
+
+<!-- 02 CONVERSATION -->
+<div class="cap"><b>deux</b>la conversation, à la lueur des chandelles</div>
+<div class="app">
+  <!-- miroir ovale des canaux -->
+  <div class="abs satin" style="left:40px;top:40px;width:250px;height:720px;border-radius:125px;padding:44px 26px;box-sizing:border-box;text-align:center">
+    <img src="logo.png" alt="WireChat" style="width:58px;height:58px;object-fit:contain;border-radius:50%;background:#14100A;padding:7px;box-sizing:border-box;box-shadow:0 0 0 2px var(--gold)">
+    <div class="ttl" style="margin-top:12px">Équipe <em>projet</em></div>
+    <div class="kicker" style="margin:4px 0 22px">les salons</div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch">
+      <span class="btn" style="justify-content:space-between;border-color:var(--line)"># général <span class="badge">4</span></span>
+      <span class="btn lip" style="justify-content:center"># maquettes</span>
+      <span class="btn" style="justify-content:flex-start;border-color:var(--line)"># annonces</span>
+      <span class="btn" style="justify-content:flex-start;border-color:var(--line)"># hors-sujet</span>
+      <span class="btn ghost sm" style="justify-content:center;margin-top:6px"><svg class="i"><use href="#i-plus"/></svg>Nouveau salon</span>
+    </div>
+    <div class="kicker" style="margin:30px 0 10px">présents · 4 sur 12</div>
+    <div style="display:flex;justify-content:center"><div class="av s p2">ZA<span class="on"></span></div><div class="av s p1" style="margin-left:-6px">AN<span class="on"></span></div><div class="av s p2" style="margin-left:-6px">MA<span class="on"></span></div><div class="av s p4" style="margin-left:-6px">LÉ<span class="away"></span></div></div>
+    <div class="pearl" style="position:relative;margin:40px auto 0;width:44px;height:44px;font-size:13px">⌂</div>
+  </div>
+
+  <div class="abs" style="left:340px;top:36px;right:40px;display:flex;align-items:baseline;gap:16px">
+    <div style="font:italic 800 56px/1 'Bodoni Moda'">#maquettes</div>
+    <div class="script" style="font-size:30px;color:var(--gold)">les écrans et les retours</div>
+    <span class="btn sm ghost" style="margin-left:auto"><svg class="i"><use href="#i-search"/></svg></span>
+  </div>
+  <div class="abs kicker" style="left:340px;top:110px;right:40px;display:flex;align-items:center;gap:14px">ce soir<span style="flex:1;height:1px;background:var(--line)"></span></div>
+
+  <!-- messages qui ondulent -->
+  <div class="msg" style="left:340px;top:140px"><div class="av p1">AN</div><div><div class="who">Ana<time>14:02</time></div><div class="bub">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</div><span class="rx mine">💋 3</span><span class="rx">👀 1</span></div></div>
+  <div class="msg" style="left:340px;top:262px"><div class="av p2">MA</div><div><div class="who">Marc<time>14:05</time></div><div class="bub">Oui, je prépare le résumé des retours.</div></div></div>
+  <div class="msg me" style="right:60px;top:300px"><div class="av p2">ZA</div><div><div class="who">toi<time>14:08 · modifié</time></div><div class="bub" style="max-width:390px"><div class="q">Ana · On valide la maquette demain ?</div>Parfait. Les palettes seront dans le dossier avant 16 h.</div></div></div>
+  <div class="msg" style="left:400px;top:430px"><div class="av p4">LÉ</div><div><div class="who">Léa<time>14:11</time></div><div class="bub"><span class="ment">@Zack</span> je vérifie le contraste du thème clair ce soir.</div></div></div>
+  <div class="msg me" style="right:60px;top:500px"><div class="av p2">ZA</div><div><div class="bub" style="opacity:.55">Je les envoie à Léa aussi.</div><div style="text-align:right;margin-top:8px;font:italic 400 14px 'Bodoni Moda';color:var(--neon)">pas envoyé, mon cœur · <span class="btn sm lip" style="height:28px">Réessayer</span></div></div></div>
+  <div class="abs" style="left:350px;top:600px;font:italic 400 17px 'Bodoni Moda';color:var(--gold)">Ana te fait attendre<span style="animation:heart 1.2s infinite;display:inline-block;margin-left:6px">♥</span></div>
+
+  <!-- ruban de satin -->
+  <div class="abs" style="left:330px;right:30px;top:650px;height:110px;border-radius:999px;padding:12px 14px 12px 34px;box-sizing:border-box;background:linear-gradient(100deg,var(--wine),var(--satin) 45%,var(--plum) 60%,var(--wine));border:1px solid var(--gold);box-shadow:0 18px 40px rgba(0,0,0,.4)">
+    <div style="font:italic 400 14px 'Bodoni Moda';color:var(--goldl);display:flex;gap:6px;align-items:center"><svg class="i" style="width:14px"><use href="#i-reply"/></svg>en réponse à Léa <span style="margin-left:auto;margin-right:20px;color:var(--mu);font:600 12px 'Manrope'">✕ annuler</span></div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:8px"><div class="field" style="flex:1;color:var(--mu);font:italic 400 17px 'Bodoni Moda'">Murmure quelque chose dans #maquettes…</div><span class="btn lip" style="height:48px;padding:0 26px">Envoyer <svg class="i"><use href="#i-send"/></svg></span></div>
+  </div>
+</div>
+
+<!-- 03 OPTIONS -->
+<div class="cap"><b>trois</b>les options, devant le miroir de la loge</div>
+<div class="app">
+  <div class="mirror" style="left:470px;top:110px;width:340px;height:440px">
+    <div class="av xl p2">ZA<span class="on" style="width:22px;height:22px;right:8px;bottom:8px"></span></div>
+    <div style="font:italic 800 46px 'Bodoni Moda';margin-top:16px;color:#f6e6cc">Zack</div>
+    <div class="script" style="font-size:28px;color:var(--goldl)">actif, et magnifique</div>
+  </div>
+  <!-- ampoules de loge -->
+  <div class="bulb" style="left:452px;top:200px"></div><div class="bulb" style="left:440px;top:320px"></div><div class="bulb" style="left:452px;top:440px"></div>
+  <div class="bulb" style="left:810px;top:200px"></div><div class="bulb" style="left:822px;top:320px"></div><div class="bulb" style="left:810px;top:440px"></div>
+  <div class="bulb" style="left:560px;top:94px"></div><div class="bulb" style="left:631px;top:86px"></div><div class="bulb" style="left:702px;top:94px"></div>
+
+  <div class="abs" style="left:46px;top:30px"><div style="font:italic 800 64px/1 'Bodoni Moda'">Options</div><div class="kicker" style="margin-top:6px">WireChat 1.3.1 · c4-beta-3</div></div>
+
+  <!-- étiquettes de parfum autour du miroir -->
+  <div class="tag satin" style="left:46px;top:170px;width:360px">
+    <div class="kicker">nº1 · compte</div>
+    <div style="margin-top:10px;display:grid;gap:8px"><div class="field">Zack <svg class="i"><use href="#i-pen"/></svg></div><div class="field">zack@exemple.ca <svg class="i"><use href="#i-pen"/></svg></div></div>
+  </div>
+  <div class="tag satin" style="left:46px;top:390px;width:360px">
+    <div class="kicker">nº2 · notifications</div>
+    <div class="ttl" style="font-size:22px;margin:8px 0">Qui peut te déranger ?</div>
+    <div class="chips"><span>Personne</span><span class="on">Les mentions</span><span>Tout le monde</span></div>
+  </div>
+  <div class="tag satin" style="left:874px;top:170px;width:360px">
+    <div class="kicker">nº3 · thème</div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1;text-align:center"><div style="height:80px;border-radius:999px 999px 14px 14px;background:linear-gradient(180deg,#fbefe8,#e9c4c4);border:1px solid var(--line)"></div><div style="font:italic 600 15px 'Bodoni Moda';margin-top:6px">Aube</div></div>
+      <div style="flex:1;text-align:center"><div style="height:80px;border-radius:999px 999px 14px 14px;background:linear-gradient(180deg,#4a1220,#100e0c);box-shadow:0 0 0 2px var(--lip),0 0 20px rgba(212,48,74,.5)"></div><div style="font:italic 600 15px 'Bodoni Moda';margin-top:6px;color:var(--neon)">Velours</div></div>
+      <div style="flex:1;text-align:center"><div style="height:80px;border-radius:999px 999px 14px 14px;background:linear-gradient(90deg,#fbefe8 50%,#4a1220 50%);border:1px solid var(--line)"></div><div style="font:italic 600 15px 'Bodoni Moda';margin-top:6px">Système</div></div>
+    </div>
+  </div>
+  <div class="tag satin" style="left:874px;top:390px;width:360px">
+    <div class="kicker">nº4 · accessibilité</div>
+    <div class="row" style="margin-top:6px"><div class="w"><b style="font-size:16px">Langue</b></div><span class="field" style="height:36px;width:150px">Français ▾</span></div>
+    <div class="row"><div class="w"><b style="font-size:16px">Réduire les animations</b><small>le néon arrête de clignoter</small></div><div class="sw on" role="switch" aria-checked="true"></div></div>
+  </div>
+  <div class="abs" style="left:470px;top:600px;width:340px;display:flex;flex-direction:column;gap:10px;align-items:center">
+    <span class="btn lip" style="height:48px;padding:0 34px">Sauvegarder</span>
+    <div style="display:flex;gap:10px"><span class="btn sm">Se déconnecter</span><span class="btn sm ghost" style="color:var(--neon);border-color:var(--lip)">Supprimer le compte</span></div>
+  </div>
+  <div class="neon abs" style="left:950px;top:640px;font-size:42px;transform:rotate(-5deg)">sois sage</div>
+</div>
+
+<!-- 04 SERVEUR -->
+<div class="cap"><b>quatre</b>les paramètres du serveur, la liste VIP</div>
+<div class="app">
+  <div class="curtain" style="left:0"></div>
+  <div class="curtain r" style="right:0"></div>
+  <div class="abs" style="left:170px;top:30px;right:170px;text-align:center">
+    <div class="pearl on" style="position:relative;margin:0 auto 6px;width:64px;height:64px">ÉP</div>
+    <div style="font:italic 800 56px/1 'Bodoni Moda'">Équipe projet</div>
+    <div class="script" style="font-size:28px;color:var(--gold)">12 invités · 4 salons · c'est toi l'hôte</div>
+    <div style="display:inline-flex;gap:6px;margin-top:12px;padding:5px;border-radius:999px;border:1px solid var(--line)"><span class="btn sm" style="border:0">Aperçu</span><span class="btn sm lip">Membres</span><span class="btn sm" style="border:0">Ajouter</span><span class="btn sm" style="border:0">Salons</span></div>
+  </div>
+
+  <!-- cordon de velours -->
+  <div class="post" style="left:200px;top:260px"></div><div class="post" style="left:620px;top:260px"></div>
+  <div class="rope" style="left:224px;top:270px;width:404px;transform:translateY(14px);border-radius:0 0 200px 200px/0 0 40px 40px;height:30px"></div>
+  <div class="satin abs" style="left:180px;top:330px;width:480px;height:430px;border-radius:30px;padding:18px 26px;box-sizing:border-box">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><div class="ttl">La liste <em>VIP</em></div><span class="kicker">12 noms</span></div>
+    <div class="vip"><div class="av p2">ZA<span class="on"></span></div><div><b>Zack</b><small>propriétaire du serveur</small></div><span class="status" style="color:var(--gold)">♛ l'hôte</span><span></span></div>
+    <div class="vip"><div class="av p1">AN<span class="on"></span></div><div><b>Ana</b><small>membre · en ligne</small></div><span class="status" style="color:var(--ok)">sur la piste</span><span class="btn sm ghost">Raccompagner</span></div>
+    <div class="vip"><div class="av p2">MA<span class="on"></span></div><div><b>Marc</b><small>membre · en ligne</small></div><span class="status" style="color:var(--ok)">sur la piste</span><span class="btn sm ghost">Raccompagner</span></div>
+    <div class="vip"><div class="av p4">LÉ<span class="away"></span></div><div><b>Léa</b><small>membre · inactive</small></div><span class="status" style="color:var(--gold)">au bar</span><span class="btn sm ghost">Raccompagner</span></div>
+    <div class="vip"><div class="av p5">SO</div><div><b>Sofia</b><small>membre · hors ligne</small></div><span class="status" style="color:var(--mu)">au vestiaire</span><span class="btn sm ghost">Raccompagner</span></div>
+  </div>
+
+  <div class="arch satin" style="left:700px;top:240px;width:220px;height:340px">
+    <div class="kicker" style="text-align:center">les salons</div>
+    <div style="display:grid;gap:8px;margin-top:14px">
+      <div class="field" style="height:38px"># général <span style="display:flex;gap:8px;color:var(--mu)"><svg class="i" style="width:15px"><use href="#i-pen"/></svg><svg class="i" style="width:15px"><use href="#i-trash"/></svg></span></div>
+      <div class="field" style="height:38px;border-color:var(--lip);box-shadow:0 0 14px rgba(212,48,74,.4)">maquettes-v2 <span class="badge">ok</span></div>
+      <div class="field" style="height:38px"># annonces <span style="display:flex;gap:8px;color:var(--mu)"><svg class="i" style="width:15px"><use href="#i-pen"/></svg><svg class="i" style="width:15px"><use href="#i-trash"/></svg></span></div>
+      <div class="field" style="height:38px"># hors-sujet <span style="display:flex;gap:8px;color:var(--mu)"><svg class="i" style="width:15px"><use href="#i-pen"/></svg><svg class="i" style="width:15px"><use href="#i-trash"/></svg></span></div>
+      <span class="btn sm ghost" style="justify-content:center"><svg class="i"><use href="#i-plus"/></svg>Nouveau salon</span>
+    </div>
+  </div>
+  <div class="pill satin" style="left:700px;top:600px;width:220px;padding:14px 18px">
+    <div class="kicker">sur invitation</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px"><div class="av s p3">TO</div><b style="font:italic 600 16px 'Bodoni Moda';flex:1">Tom</b><span class="btn sm lip" style="height:28px">Inviter</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px"><div class="av s p4">NI</div><b style="font:italic 600 16px 'Bodoni Moda';flex:1">Nina</b><span style="font:italic 400 13px 'Bodoni Moda';color:var(--gold)">invitée ✓</span></div>
+  </div>
+  <div class="abs" style="left:940px;top:300px;width:170px;text-align:center">
+    <div class="script" style="font-size:30px;color:var(--gold);line-height:1">fermer la boîte</div>
+    <div style="font:italic 400 13px 'Bodoni Moda';color:var(--mu);margin:8px 0 14px">Supprime le serveur, ses salons et tous les messages, pour tout le monde.</div>
+    <span class="btn lip" style="animation:heart 2.4s infinite">Supprimer le serveur</span>
+    <div class="neon" style="font-size:36px;margin-top:30px;transform:rotate(-8deg)">dernière tournée</div>
+  </div>
+</div>
+</main>
+</body>
+</html>
