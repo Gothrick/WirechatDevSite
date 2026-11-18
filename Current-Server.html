@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WireChat today: server and channel - WireChat redesign</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+<style>
+body{margin:0}
+.dark{--base:#100e0c;--surf:#17130f;--hov:#2b241b;--elev:#1f1a14;--bd:#3a3226;--ad:#b98f4a;--tp:#f0ddb0;--ts:#d8c69e;--tm:#9c8f74;--n500:#8a8a8a;--n950:#1a1a1a;--sb:#2f5a3a;--sbs:#dff5e4;--dd:#8b1e1e;--warn:#dfa13d;--ink:#241b12;--ov1:rgba(0,0,0,.15);--g1:#e7b45c;--g2:#c98a2e;--amb:#241a08;--ok:#8fbf6f;--sh:rgba(0,0,0,.4);--ac:#eab766}
+.light{--base:#f5efe9;--surf:#f3ebe0;--hov:#e8d7b4;--elev:#ffffff;--bd:#d0c0a8;--ad:#b98f4a;--tp:#201b17;--ts:#3a3226;--tm:#6f6553;--n500:#8a8a8a;--n950:#e6dccb;--sb:#356a41;--sbs:#dff5e4;--dd:#8b1e1e;--warn:#dfa13d;--ink:#100e0c;--ov1:rgba(0,0,0,.08);--g1:#e7b45c;--g2:#c98a2e;--amb:#5c4520;--ok:#356a41;--sh:rgba(0,0,0,.18);--ac:#eab766}
+.app{position:relative;z-index:1;width:100%;min-width:1100px;height:800px;box-sizing:border-box;background:var(--base);color:var(--tp);font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;display:grid;grid-template-columns:84px 260px minmax(0,1fr);overflow:hidden}
+.app:after{content:"";position:absolute;inset:0;z-index:200;background:repeating-linear-gradient(180deg,var(--ov1) 0,var(--ov1) 1px,transparent 2px,transparent 3px);mix-blend-mode:multiply;opacity:.35;pointer-events:none}
+.app:before{content:"";position:absolute;inset:0;z-index:50;background-image:repeating-conic-gradient(var(--tm) 0% 25%,var(--hov) 0% 50%);background-size:8px 8px;opacity:.18;mix-blend-mode:overlay;pointer-events:none}
+.rail,.main{position:relative;isolation:isolate}
+.rail:before,.main:before{content:"";position:absolute;inset:0;z-index:0;background-image:repeating-conic-gradient(var(--hov) 0% 25%,var(--elev) 0% 50%);background-size:4px 4px;opacity:.35;pointer-events:none}
+.rail>*,.main>*{position:relative;z-index:1}
+.rail{display:flex;flex-direction:column;align-items:center;gap:18px;padding:20px 0;background:var(--surf);border-right:1px solid var(--bd)}
+.rl{width:52px;height:52px;margin-bottom:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--hov);border:1px solid var(--bd);border-radius:0;padding:0}
+.rl.on{border-color:var(--ad)}
+.rl img{width:100%;height:100%;object-fit:cover}
+.sl{display:flex;flex-direction:column;align-items:center;gap:18px}
+.sbdg{position:relative;width:58px;height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--sb);color:var(--sbs);border:2px solid transparent;border-radius:16px;font-size:17px;font-weight:600;cursor:pointer}
+.sbdg.on{border-color:var(--ad)}
+.sbdg.add{background:var(--hov);color:var(--ts);border-color:var(--bd);font-weight:400;font-size:24px}
+.ub{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:20px;box-sizing:border-box;padding:1px 6px;background:var(--warn);color:var(--ink);border-radius:10px;font-size:12px;font-weight:700;line-height:18px}
+.sbdg .ub{position:absolute;top:-6px;right:-6px}
+.rf{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:auto}
+.rib{position:relative;width:48px;height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--hov);color:var(--tp);border:1px solid var(--bd);border-radius:14px;cursor:pointer;font-size:16px;font-weight:600}
+.rib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rbadge{position:absolute;top:-6px;right:-6px;min-width:20px;box-sizing:border-box;padding:1px 5px;background:var(--dd);color:#fff;border-radius:10px;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.side{display:flex;flex-direction:column;min-height:0;background:var(--surf);border-right:1px solid var(--bd)}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 12px 20px;border-bottom:1px solid var(--bd)}
+.sh h2{margin:0;font-size:16px;font-weight:600;color:var(--tp)}
+.gear{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ts);border:1px solid var(--bd);border-radius:8px;cursor:pointer}
+.gear svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lt{margin:0;padding:20px 20px 10px;color:var(--tm);font-size:15px;letter-spacing:.02em;display:flex;align-items:center;justify-content:space-between;font-weight:400}
+.lt button{width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--tm);border:0;cursor:pointer;padding:0}
+.lt button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.items{display:flex;flex-direction:column;gap:3px;padding:0 10px}
+.it{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;padding:10px;background:transparent;color:var(--ts);border:1px solid transparent;border-radius:0;text-align:left;cursor:pointer}
+.it.on{background:var(--elev);border-color:var(--ad)}
+.it .px{font-family:'Press Start 2P','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6}
+.it .pre{color:var(--tm)}
+.it .nm{color:var(--tp);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .ub{margin-left:auto}
+.dmi{gap:13px}
+.dmi .nm{font-size:15px}
+.av{position:relative;width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--n500);color:var(--n950);font-size:14px;font-weight:700;border-radius:0}
+.av.gold{background:linear-gradient(160deg,var(--g1),var(--g2));color:var(--amb)}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--base)}
+.cb{display:flex;align-items:center;justify-content:space-between;height:72px;box-sizing:border-box;padding:0 30px;border-bottom:1px solid var(--bd)}
+.ct{margin:0;color:var(--ts);font-size:17px;font-weight:400}
+.ct strong{color:var(--tp);font-family:'Press Start 2P','Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;font-weight:600}
+.cs{display:flex;align-items:center;gap:10px;background:transparent;color:var(--tm);font-size:16px;border:0;cursor:pointer}
+.cs svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.content{position:relative;z-index:1;flex:1;min-height:0;display:flex}
+.msgs{flex:1;min-width:0;display:flex;flex-direction:column;gap:22px;padding:30px 30px 16px;overflow:hidden}
+.row{display:flex;align-items:flex-start;gap:15px}
+.row.mine{flex-direction:row-reverse}
+.bw{display:flex;flex-direction:column;gap:5px;max-width:60%}
+.row.mine .bw{align-items:flex-end}
+.meta{display:flex;align-items:baseline;gap:10px;color:var(--tm);font-size:14px}
+.meta .sender{color:var(--tp);font-size:16px;font-weight:600}
+.meta .ed{font-size:12px;font-style:italic}
+.meta .rp{background:none;border:0;color:var(--tm);font:inherit;font-size:12px;padding:0;cursor:pointer;opacity:0}
+.row.hov .rp{opacity:1}
+.bub{position:relative;margin:0 0 10px;padding:10px 15px;background:var(--hov);color:var(--tp);border:2px solid var(--bd);font-size:17px;line-height:1.4}
+.bub:before{content:"";position:absolute;left:14px;bottom:-10px;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid var(--bd)}
+.bub:after{content:"";position:absolute;left:16px;bottom:-6px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid var(--hov)}
+.row.mine .bub{background:var(--bd)}
+.row.mine .bub:after{border-top-color:var(--bd)}
+.rx{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;background:var(--hov);color:var(--tp);border:1px solid var(--bd);border-radius:12px;font-size:14px;line-height:1.6;cursor:pointer}
+.chip.mine{border-color:var(--ac)}
+.members{width:240px;flex-shrink:0;box-sizing:border-box;border-left:1px solid var(--bd);background:var(--surf);padding:20px 10px;display:flex;flex-direction:column;gap:3px}
+.members h3{margin:0;padding:0 10px 8px;color:var(--tm);font-size:15px;font-weight:400;letter-spacing:.02em}
+.contact{display:flex;align-items:center;gap:13px;padding:10px;border:1px solid transparent;color:var(--ts)}
+.contact .av{width:34px;height:34px;font-size:12px}
+.contact .st{display:block;color:var(--tm);font-size:12px;margin-top:3px}
+.contact b{font-weight:400;color:var(--tp);font-size:14px}
+.typing{padding:0 30px 10px;color:var(--tm);font-size:14px;display:flex;align-items:center;gap:8px;min-height:20px}
+.typing i{display:inline-block;width:6px;height:6px;background:var(--ad);border-radius:50%;margin-right:3px}
+.comp{flex-shrink:0;padding:18px 30px;border-top:1px solid var(--bd)}
+.comp .in{width:100%;box-sizing:border-box;padding:15px 20px;background:var(--elev);color:var(--tm);border:1px solid var(--bd);font-size:17px;border-radius:0}
+.tb{display:flex;align-items:center;gap:36px;height:72px;box-sizing:border-box;padding:0 30px;border-bottom:1px solid var(--bd)}
+.tb .nav{padding:8px 3px;background:transparent;color:var(--ts);font-size:17px;border:0;cursor:pointer;font-family:inherit}
+.tb .nav.on{color:var(--tp);font-weight:600;box-shadow:inset 0 -2px 0 var(--ad)}
+.afs{margin-left:auto;display:flex;align-items:center;gap:10px;height:40px;box-sizing:border-box;padding:0 12px;width:300px;background:var(--elev);border:1px solid var(--bd);border-radius:4px;color:var(--tm);font-size:14px}
+.afs svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ol{display:flex;flex-direction:column;gap:4px;padding:4px 6px}
+.ou{display:flex;align-items:center;width:100%;box-sizing:border-box;min-height:58px;padding:6px 10px;color:var(--ts);border:1px solid transparent}
+.ou.hov{background:var(--hov);border-color:var(--ad);border-radius:12px}
+.ou .inf{display:flex;flex-direction:column;margin-left:30px}
+.ou .un{color:var(--tp);font-size:14px}
+.ou .us{margin-top:5px;color:var(--tm);font-size:12px}
+.ou .ac{display:flex;align-items:center;gap:12px;margin-left:auto;opacity:0}
+.ou.hov .ac{opacity:1}
+.ou .msgb{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:#f0eee8;color:#5b5a56;border-radius:50%}
+.ou .msgb svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ou .more{color:var(--tp);font-size:18px;font-weight:700;letter-spacing:3px}
+.ou .tag{margin-left:auto;font-size:.85rem;font-weight:500;color:#949ba4;font-style:italic;margin-right:12px}
+.wm{position:absolute;inset:0;background:url(/_blob/6de39ae532dd4161342cf1e2b76c0a7c) center/70% no-repeat;opacity:.12;pointer-events:none}
+.rail-note{position:absolute}
+</style>
+
+<style>html,body{margin:0}</style>
+</head><body>
+
+<div class="app dark">
+
+  <nav class="rail" aria-label="Navigation principale">
+    <button class="rl " aria-label="Accueil"><img src="logo.png" alt=""></button>
+    <div class="sl">
+      <div class="sbdg on" aria-label="Équipe projet">ÉP</div>
+      <div class="sbdg" aria-label="Études, 3 non lus">ÉT<span class="ub">3</span></div>
+      <div class="sbdg" aria-label="Musique">MU</div>
+      <div class="sbdg add" aria-label="Créer un serveur">+</div>
+    </div>
+    <div class="rf">
+      <button class="rib" aria-label="Recherche"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg></button>
+      <button class="rib" aria-label="Notifications, 2 non lues"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></svg><span class="rbadge">2</span></button>
+      <button class="rib" aria-label="Profil">ZA</button>
+    </div>
+  </nav>
+  <aside class="side">
+    <div class="sh"><h2>Équipe projet</h2><button class="gear" aria-label="Paramètres du serveur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>
+    <div class="lt">Canaux</div>
+    <div class="items">
+      <div class="it on"><span class="px pre">#</span><span class="px nm">général</span></div>
+      <div class="it"><span class="px pre">#</span><span class="px nm">maquettes</span><span class="ub">3</span></div>
+      <div class="it"><span class="px pre">#</span><span class="px nm">musique</span></div>
+      <div class="it"><span class="px pre">#</span><span class="px nm">retours</span><span class="ub">12</span></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="cb"><h1 class="ct">Canal : <strong>général</strong></h1><button class="cs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>Rechercher</span></button></div>
+    <div class="content">
+      <div class="msgs">
+        <div class="row"><span class="av">AN</span><div class="bw"><div class="meta"><span class="sender">Ana</span><span>14:02</span></div><p class="bub" style="margin-bottom:10px">On valide la maquette demain ? J'ai préparé les captures de l'écran d'accueil.</p></div></div>
+        <div class="row hov"><span class="av">MA</span><div class="bw"><div class="meta"><span class="sender">Marc</span><span>14:05</span><button class="rp">Répondre</button></div><p class="bub">Oui, je prépare le résumé des retours pour la réunion.</p><div class="rx" style="margin-top:0"><span class="chip">👍 3</span><span class="chip mine">🎉 2</span><span class="chip">+</span></div></div></div>
+        <div class="row mine"><span class="av gold">ZA</span><div class="bw"><div class="meta"><span class="sender">Zack</span><span>14:08</span><span class="ed">modifié</span></div><p class="bub">Parfait. Je mets les trois palettes dans le dossier partagé avant 16 h.</p></div></div>
+        <div class="row"><span class="av">LÉ</span><div class="bw"><div class="meta"><span class="sender">Léa</span><span>14:11</span></div><p class="bub">Je regarde le contraste du thème clair ce soir et je vous dis.</p></div></div>
+      </div>
+      <aside class="members" aria-label="Membres du canal">
+        <h3>Membres : 6</h3>
+        <div class="contact"><span class="av gold">ZA</span><span><b>Zack</b><span class="st">En ligne</span></span></div>
+        <div class="contact"><span class="av">AN</span><span><b>Ana</b><span class="st">En ligne</span></span></div>
+        <div class="contact"><span class="av">LÉ</span><span><b>Léa</b><span class="st">En ligne</span></span></div>
+        <div class="contact"><span class="av">MA</span><span><b>Marc</b><span class="st">Inactif</span></span></div>
+        <div class="contact"><span class="av">SO</span><span><b>Sofia</b><span class="st">Hors ligne</span></span></div>
+        <div class="contact"><span class="av">TH</span><span><b>Théo</b><span class="st">Hors ligne</span></span></div>
+      </aside>
+    </div>
+    <div class="typing"><span><i></i><i></i><i></i></span>Ana est en train d'écrire…</div>
+    <div class="comp"><div class="in">Écrire un message...</div></div>
+  </main>
+</div>
+
+
+<button id="wc-toggle" type="button" style="position:fixed;right:16px;bottom:16px;z-index:9999;min-height:44px;padding:0 18px;border-radius:999px;border:2px solid #888;background:#fff;color:#111;font:600 15px system-ui,sans-serif;cursor:pointer">Switch theme</button>
+<script>
+(function(){
+  var b=document.getElementById('wc-toggle');
+  if(location.search.indexOf('thumb')>-1){b.style.display='none';}
+  b.addEventListener('click',function(){
+    var els=document.querySelectorAll('.dark,.light');
+    els.forEach(function(e){
+      if(e.classList.contains('dark')){e.classList.remove('dark');e.classList.add('light');}
+      else{e.classList.remove('light');e.classList.add('dark');}
+    });
+  });
+})();
+</script>
+</body></html>

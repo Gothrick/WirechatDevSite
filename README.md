@@ -1,4 +1,4 @@
-# WireChat redesign directions
+﻿# WireChat baseline mockups
 
-Static design mockups (no app code): Flight Deck, Mission Control and Console Grey, for web and mobile.
-Open `index.html`. Live: https://wirechat-redesign.vercel.app
+Static mockups of the current WireChat web app, redrawn from its real styles. Open index.html.
+Live: https://wirechat-redesign.vercel.app
