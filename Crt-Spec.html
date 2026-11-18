@@ -148,14 +148,18 @@ button{font:inherit;color:inherit;text-shadow:inherit;background:none;border:0;p
 .dot.un,.typ i,.caret{box-shadow:var(--glow-a)}
 .col.focus,.send,.chip.mine,.m.sel,.btn.done,.sec.cur,.row.on,.status .live{position:relative;isolation:isolate}
 .col.focus,.send,.chip.mine,.m.sel,.btn.done,.sec.cur,.row.on{overflow:hidden}
-.fx .col.focus:after,.fx .send:after,.fx .chip.mine:after,.fx .m.sel:after,.fx .btn.done:after,.fx .sec.cur:after,.fx .row.on:after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;background:repeating-linear-gradient(0deg,var(--crt-line) 0 1px,transparent 1px 3px);animation:crt-roll 1.2s linear infinite}
-.fx .col.focus:before,.fx .send:before,.fx .m.sel:before,.fx .sec.cur:before{content:"";position:absolute;left:0;right:0;top:0;height:38%;z-index:6;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,transparent,var(--crt-band) 50%,transparent);animation:crt-sweep 7s cubic-bezier(.4,0,.6,1) infinite}
+.fx .col.focus:after,.fx .send:after,.fx .chip.mine:after,.fx .btn.done:after,.fx .sec.cur:after,.fx .row.on:after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;background:repeating-linear-gradient(0deg,var(--crt-line) 0 1px,transparent 1px 3px);animation:crt-roll 1.2s linear infinite}
+.fx .col.focus:before,.fx .send:before,.fx .sec.cur:before{content:"";position:absolute;left:0;right:0;top:0;height:38%;z-index:6;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,transparent,var(--crt-band) 50%,transparent);animation:crt-sweep 7s cubic-bezier(.4,0,.6,1) infinite}
 .fx .col.focus{animation:crt-breathe-frame 4s ease-in-out infinite alternate}
 .fx .send,.fx .chip.mine,.fx .btn.done{animation:crt-breathe 4s ease-in-out infinite alternate}
 .fx .dot.open,.fx .status .live i{animation:crt-breathe 4s ease-in-out infinite alternate}
 .fx .focus .ch .t,.fx .status .live,.fx .chrow.on .nm,.fx .sec.cur .lbl{animation:crt-text 4s ease-in-out infinite alternate}
 .dark{--crt-line:rgba(0,0,0,.2);--crt-band:rgba(178,233,235,.16)}
 .light{--crt-line:rgba(11,93,99,.14);--crt-band:rgba(255,255,255,.4)}
+.fx .col.focus:after,.fx .col.focus:before{padding:6px;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.fx .col.focus:after{background:repeating-linear-gradient(0deg,var(--crt-line) 0 1px,transparent 1px 3px),linear-gradient(var(--blue-glow),var(--blue-glow))}
+.fx .col.focus:before{height:auto;bottom:0;background:linear-gradient(180deg,transparent 0%,var(--crt-band) 18%,transparent 36%) 0 0/100% 280% no-repeat;transform:none;animation:crt-sweep-ring 7s cubic-bezier(.4,0,.6,1) infinite}
+@keyframes crt-sweep-ring{0%{background-position:0 100%}60%,100%{background-position:0 -40%}}
 @keyframes crt-roll{from{background-position:0 0}to{background-position:0 3px}}
 @keyframes crt-sweep{0%{transform:translateY(-110%)}60%,100%{transform:translateY(280%)}}
 @keyframes crt-breathe{from{filter:drop-shadow(0 0 2px var(--blue-glow))}to{filter:drop-shadow(0 0 7px var(--blue-glow))}}
@@ -215,7 +219,7 @@ button{font:inherit;color:inherit;text-shadow:inherit;background:none;border:0;p
       <div class="big"><div class="field" style="min-height:64px"><span class="val" style="font-size:20px">ok, je regarde le<span class="caret" style="height:22px;width:11px"></span></span><span class="kbd">Entrée</span><button class="send" style="width:74px;height:56px" aria-label="Envoyer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg></button></div></div>
       <ol>
         <li><b>Lueur qui respire</b> : le halo bleu monte et redescend doucement toutes les 4 s. Aucun clignotement.</li>
-        <li><b>Balayage</b> : une ligne sombre toutes les 3 px, qui défile lentement vers le bas, seulement sur les éléments bleus.</li>
+        <li><b>Balayage</b> : une ligne sombre toutes les 3 px, qui défile lentement vers le bas, sur le cadre de la colonne active et les petits éléments bleus, jamais sur la conversation.</li>
         <li><b>Bande de rafraîchissement</b> : une bande claire traverse l'élément bleu de haut en bas toutes les 7 s.</li>
         <li><b>Touche lumineuse</b> : bouton d'envoi en dégradé bleu Trinitron, reflet en haut, liseré sombre, halo.</li>
         <li><b>Curseur bloc</b> et <b>touches</b> dessinées pour les raccourcis.</li>
