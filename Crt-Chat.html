@@ -180,6 +180,12 @@ button{font:inherit;color:inherit;text-shadow:inherit;background:none;border:0;p
 .fx .col.focus:after{background:repeating-linear-gradient(0deg,var(--crt-line) 0 1px,transparent 1px 3px),linear-gradient(var(--blue-glow),var(--blue-glow))}
 .fx .col.focus:before{height:auto;bottom:0;background:linear-gradient(180deg,transparent 0%,var(--crt-band) 18%,transparent 36%) 0 0/100% 280% no-repeat;transform:none;animation:crt-sweep-ring 7s cubic-bezier(.4,0,.6,1) infinite}
 @keyframes crt-sweep-ring{0%{background-position:0 100%}60%,100%{background-position:0 -40%}}
+.light.fx .col.focus:after,.light.fx .send:after,.light.fx .chip.mine:after,.light.fx .btn.done:after,.light.fx .sec.cur:after,.light.fx .row.on:after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1.9 0 0 0 -.38  1.85 0 0 0 -.38  1.75 0 0 0 -.38  0 0 0 0 .85'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px;animation:crt-noise .48s steps(1) infinite;opacity:.6}
+.light.fx .col.focus:after{opacity:1}
+.light.fx .send:after,.light.fx .chip.mine:after,.light.fx .btn.done:after,.light.fx .sec.cur:after,.light.fx .row.on:after{z-index:-1;opacity:.45}
+.light.fx .col.focus:before,.light.fx .send:before,.light.fx .sec.cur:before{display:none}
+.light.fx .col.focus,.light.fx .send,.light.fx .chip.mine,.light.fx .btn.done,.light.fx .dot.open,.light.fx .focus .ch .t,.light.fx .chrow.on .nm,.light.fx .sec.cur .lbl{animation:none}
+@keyframes crt-noise{0%{background-position:0 0}17%{background-position:-37px 21px}33%{background-position:24px -46px}50%{background-position:-58px -13px}67%{background-position:41px 52px}83%{background-position:-12px 68px}}
 @keyframes crt-roll{from{background-position:0 0}to{background-position:0 3px}}
 @keyframes crt-sweep{0%{transform:translateY(-110%)}60%,100%{transform:translateY(280%)}}
 @keyframes crt-breathe{from{filter:drop-shadow(0 0 2px var(--blue-glow))}to{filter:drop-shadow(0 0 7px var(--blue-glow))}}
