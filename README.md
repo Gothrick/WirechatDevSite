@@ -1,4 +1,4 @@
-﻿# WireChat baseline mockups
+﻿# WireChat redesign mockups
 
-Static mockups of the current WireChat web app, redrawn from its real styles. Open index.html.
+CRT redesign (modular chat columns, server dashboard, palette and effects) next to the current WireChat web app. Open index.html.
 Live: https://wirechat-redesign.vercel.app
